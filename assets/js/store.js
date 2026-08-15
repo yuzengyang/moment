@@ -205,24 +205,9 @@ async function loadGithubMetaAnon() {
 }
 
 /* 展览页统一入口：返回 { photos, source } */
-/* source: 'github-live' | 'static' | 'local' */
+/* 顺序：GitHub 实时（匿名可读，不依赖任何本地设置）→ 本地 IndexedDB（演示）→ 静态文件 */
 async function loadGalleryPhotos() {
-  if (detectMode() === 'local') {
-    const photos = [];
-    const metas = localMeta();
-    for (let i = 0; i < metas.length; i++) {
-      const p = metas[i];
-      const blob = await getBlobDB(p.id);
-      const url = blob ? URL.createObjectURL(blob) : null;
-      photos.push(Object.assign({}, p, { url: url }));
-    }
-    return { photos: photos, source: 'local' };
-  }
-
-  // 先静态（快、无速率限制），再匿名实时刷新（最新）
-  const staticPhotos = await loadStaticPhotos();
   const fresh = await loadGithubPhotosAnon();
-
   if (fresh && fresh.length) {
     return {
       photos: fresh.map(function (p) {
@@ -231,6 +216,20 @@ async function loadGalleryPhotos() {
       source: 'github-live'
     };
   }
+
+  const metas = localMeta();
+  if (metas.length) {
+    const photos = [];
+    for (let i = 0; i < metas.length; i++) {
+      const p = metas[i];
+      const blob = await getBlobDB(p.id);
+      const url = blob ? URL.createObjectURL(blob) : null;
+      photos.push(Object.assign({}, p, { url: url }));
+    }
+    if (photos.length) return { photos: photos, source: 'local' };
+  }
+
+  const staticPhotos = await loadStaticPhotos();
   if (staticPhotos && staticPhotos.length) {
     return { photos: staticPhotos.map(function (p) { return Object.assign({}, p, { url: p.file }); }), source: 'static' };
   }
@@ -239,9 +238,9 @@ async function loadGalleryPhotos() {
 
 /* 管理页统一入口：返回完整照片列表（github 模式含实时数据） */
 async function loadPhotos() {
-  if (detectMode() === 'local') return localMeta();
   const fresh = await loadGithubPhotosAnon();
   if (fresh) return fresh;
+  if (localMeta().length) return localMeta();
   return (await loadStaticPhotos()) || [];
 }
 
@@ -254,7 +253,8 @@ async function loadPhotos() {
 async function uploadPhotos(entries, onProgress) {
   if (!entries || !entries.length) return { uploaded: 0, failed: [] };
 
-  if (detectMode() === 'github') {
+  // 只要浏览器里保存了 Token，就写入 GitHub（展览台必见）；无 Token 才用本地演示存储
+  if (lsGet(TOKEN_KEY)) {
     const uploadedMetas = [];
     const failed = [];
 
