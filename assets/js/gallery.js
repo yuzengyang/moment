@@ -5,6 +5,8 @@
 
   let photos = [];
   let currentIndex = -1;
+  const SHOW_INITIAL = 12;   // 主页默认展示最新 12 张
+  let expanded = false;      // 是否展开全部
 
   const grid = document.getElementById('grid');
   const countEl = document.getElementById('photoCount');
@@ -20,11 +22,12 @@
   const modalCount = document.getElementById('modalCount');
 
   modalImg.addEventListener('error', function () {
-    if (modalImg.src.indexOf('raw.githubusercontent.com') > -1) {
-      modalImg.src = modalImg.src.replace('raw.githubusercontent.com/', 'cdn.jsdelivr.net/gh/').replace('/main/', '@main/');
-    } else if (modalImg.src.indexOf('cdn.jsdelivr.net') === -1) {
-      modalImg.src = PLACEHOLDER;
-    }
+    const cur = modalImg.src;
+    const m1 = cur.match(/https:\/\/([^/]+)\.github\.io\/([^/]+)\/(.+)/);
+    if (m1) { modalImg.src = 'https://cdn.jsdelivr.net/gh/' + m1[1] + '/' + m1[2] + '@main/' + m1[3]; return; }
+    const m2 = cur.match(/https:\/\/cdn\.jsdelivr\.net\/gh\/([^/]+)\/([^@]+)@main\/(.+)/);
+    if (m2) { modalImg.src = 'https://raw.githubusercontent.com/' + m2[1] + '/' + m2[2] + '/main/' + m2[3]; return; }
+    if (cur.indexOf('raw.githubusercontent.com') > -1 || cur.indexOf('blob:') !== 0) modalImg.src = PLACEHOLDER;
   });
 
   const PLACEHOLDER = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(
@@ -77,8 +80,18 @@
     countEl.innerHTML = '<b>' + photos.length + '</b> 段时光';
     syncEl.innerHTML = '<span class="pulse-dot"></span>' + (SOURCE_LABEL[photos._source] || '');
 
-    photos.forEach(function (p, idx) { buildCard(p, idx); });
+    const visible = expanded ? photos : photos.slice(0, SHOW_INITIAL);
+    visible.forEach(function (p, idx) { buildCard(p, idx); });
     lazyLoad();
+
+    const moreWrap = document.getElementById('moreWrap');
+    const moreBtn = document.getElementById('moreBtn');
+    if (photos.length > SHOW_INITIAL && moreWrap) {
+      moreWrap.style.display = 'block';
+      moreBtn.textContent = expanded ? '收起' : '查看更多照片（共 ' + photos.length + ' 张）';
+    } else if (moreWrap) {
+      moreWrap.style.display = 'none';
+    }
   }
 
   /* 懒加载 + 入场动画 */
@@ -148,11 +161,24 @@
       .replace(/"/g, '&quot;');
   }
 
-  /* 图片加载失败：raw → jsDelivr（国内 CDN）→ 占位图 */
+  /* 图片加载失败逐级兜底：Pages 静态 → jsDelivr CDN → raw → 占位图 */
   function fallbackImg(img) {
-    if (img.src.indexOf('raw.githubusercontent.com') > -1) {
-      img.src = img.src.replace('raw.githubusercontent.com/', 'cdn.jsdelivr.net/gh/').replace('/main/', '@main/');
-    } else if (img.src.indexOf('cdn.jsdelivr.net') === -1) {
+    const cur = img.src;
+    if (cur.indexOf('github.io') > -1) {
+      // Pages 静态失败 → jsDelivr
+      const m = cur.match(/https:\/\/([^/]+)\.github\.io\/([^/]+)\/(.+)/);
+      if (m) img.src = 'https://cdn.jsdelivr.net/gh/' + m[1] + '/' + m[2] + '@main/' + m[3];
+      else img.src = PLACEHOLDER;
+    } else if (cur.indexOf('cdn.jsdelivr.net') > -1) {
+      // jsDelivr 失败 → raw
+      const m = cur.match(/https:\/\/cdn\.jsdelivr\.net\/gh\/([^/]+)\/([^@]+)@main\/(.+)/);
+      if (m) img.src = 'https://raw.githubusercontent.com/' + m[1] + '/' + m[2] + '/main/' + m[3];
+      else img.src = PLACEHOLDER;
+    } else if (cur.indexOf('raw.githubusercontent.com') > -1) {
+      // raw 失败 → 占位
+      img.src = PLACEHOLDER;
+      img.classList.add('loaded');
+    } else if (cur.indexOf('blob:') !== 0) {
       img.src = PLACEHOLDER;
       img.classList.add('loaded');
     }
@@ -176,6 +202,13 @@
   document.getElementById('modalClose').addEventListener('click', closeModal);
   document.getElementById('modalPrev').addEventListener('click', function () { step(-1); });
   document.getElementById('modalNext').addEventListener('click', function () { step(1); });
+  const moreBtn = document.getElementById('moreBtn');
+  if (moreBtn) {
+    moreBtn.addEventListener('click', function () {
+      expanded = !expanded;
+      render();
+    });
+  }
 
   /* ---------- 回到顶部 ---------- */
 
