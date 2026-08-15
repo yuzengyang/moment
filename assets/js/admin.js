@@ -53,14 +53,25 @@
   /* ---------- 模式显示 ---------- */
 
   function refreshModeBar() {
-    const isGithub = detectMode() === 'github';
-    els.modeTag.textContent = isGithub ? 'GitHub 实时' : '本地演示';
-    els.modeTag.className = 'tag ' + (isGithub ? 'github' : 'local');
-    els.modeText.textContent = isGithub
-      ? '照片会写入 GitHub 仓库，展览页刷新即可看到最新内容。'
-      : '照片只存在这台电脑的浏览器里（仅本机可见），配置 GitHub Token 后即可正式上线。';
-    els.radioLocal.checked = !isGithub;
-    els.radioGithub.checked = isGithub;
+    const wantGithub = lsGet(MODE_KEY) === 'github';
+    const hasToken = !!lsGet('om_token');
+
+    if (wantGithub && hasToken) {
+      els.modeTag.textContent = 'GitHub 实时';
+      els.modeTag.className = 'tag github';
+      els.modeText.textContent = '照片会写入 GitHub 仓库，任何设备打开展览页都能看到最新内容。';
+    } else if (wantGithub && !hasToken) {
+      els.modeTag.textContent = 'GitHub 待配置';
+      els.modeTag.className = 'tag pending';
+      els.modeText.textContent = '已选择 GitHub 模式，请在下方向框粘贴 Token 并点「保存并验证」，生效后上传才会写入仓库。';
+    } else {
+      els.modeTag.textContent = '本地演示';
+      els.modeTag.className = 'tag local';
+      els.modeText.textContent = '照片只存在这台电脑的浏览器里（仅本机可见），配置 GitHub Token 后即可正式上线。';
+    }
+
+    els.radioLocal.checked = !wantGithub;
+    els.radioGithub.checked = wantGithub;
     els.tokenInput.value = lsGet('om_token') || '';
     refreshTokenState();
   }
@@ -206,7 +217,11 @@
       const n = await uploadPhotos(prepared);
       pendingFiles = [];
       renderUploadList();
-      toast('上传成功 ' + n + ' 张，展览页已更新', 'ok');
+      if (lsGet(MODE_KEY) === 'github' && !lsGet('om_token')) {
+        toast('照片已存入本机，配置 Token 后需重新上传才会同步到 GitHub', 'ok');
+      } else {
+        toast('上传成功 ' + n + ' 张，展览页已更新', 'ok');
+      }
       refreshManageList();
     } catch (err) {
       toast('上传失败：' + err.message, 'err');
@@ -342,13 +357,14 @@
 
     els.radioGithub.addEventListener('change', function () {
       if (!els.radioGithub.checked) return;
-      if (!lsGet('om_token')) {
-        toast('请先在下方粘贴 GitHub Token', 'err');
-        refreshModeBar();
-        return;
-      }
       setMode('github');
       refreshModeBar();
+      if (!lsGet('om_token')) {
+        toast('请粘贴 GitHub Token 并保存验证', 'err');
+        els.tokenInput.focus();
+        els.tokenInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
       toast('已连接 GitHub，此后上传会实时同步', 'ok');
       refreshManageList();
     });
