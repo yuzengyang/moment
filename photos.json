@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-08-15T03:47:39.384Z",
+  "updated": "2026-08-15T05:35:01.409Z",
   "updatedBy": "yuzengyang",
   "photos": [
     {
@@ -10,8 +10,11 @@
       "date": "2026-08-15",
       "caption": "",
       "author": "yuzengyang",
-      "tags": [],
-      "created": "2026-08-15T03:47:04.243Z"
+      "tags": [
+        "lulu"
+      ],
+      "created": "2026-08-15T03:47:04.243Z",
+      "visibility": "public"
     },
     {
       "id": "20260815-114704-mwv",
