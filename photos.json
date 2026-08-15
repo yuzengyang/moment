@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "updated": "2026-08-15T09:17:00.000Z",
+  "photos": [
+    {
+      "id": "20260814-001",
+      "file": "photos/20260814-001.jpg",
+      "location": "",
+      "date": "2026-08-14",
+      "caption": "",
+      "author": "",
+      "tags": [],
+      "created": "2026-08-15T09:17:00.000Z"
+    },
+    {
+      "id": "20260815-001",
+      "file": "photos/20260815-001.jpg",
+      "location": "",
+      "date": "2026-08-15",
+      "caption": "",
+      "author": "",
+      "tags": [],
+      "created": "2026-08-15T09:17:00.000Z"
+    },
+    {
+      "id": "20260815-002",
+      "file": "photos/20260815-002.jpg",
+      "location": "",
+      "date": "2026-08-15",
+      "caption": "",
+      "author": "",
+      "tags": [],
+      "created": "2026-08-15T09:17:00.000Z"
+    },
+    {
+      "id": "20260815-003",
+      "file": "photos/20260815-003.jpg",
+      "location": "",
+      "date": "2026-08-15",
+      "caption": "",
+      "author": "",
+      "tags": [],
+      "created": "2026-08-15T09:17:00.000Z"
+    }
+  ],
+  "updatedBy": ""
+}
