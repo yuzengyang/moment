@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理 · 我们的时光簿</title>
+  <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body class="page-admin">
+
+  <nav class="nav" style="max-width:1080px">
+    <a class="brand" href="index.html">
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <defs><linearGradient id="lg2" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#FFB6A3"/><stop offset="1" stop-color="#F2767E"/>
+        </linearGradient></defs>
+        <path d="M32 38.5c-6.8-3.8-10.7-7.6-10.7-11.9 0-3.3 2.5-5.7 5.6-5.7 2.1 0 4.1 1.2 5.1 2.9 1-1.7 3-2.9 5.1-2.9 3.1 0 5.6 2.4 5.6 5.7 0 4.3-3.9 8.1-10.7 11.9z" fill="url(#lg2)"/>
+      </svg>
+      <span>我们的时光簿<span class="brand-sub">管理台</span></span>
+    </a>
+    <div class="nav-links">
+      <span class="nav-link" style="cursor:default;color:var(--peach);font-weight:600" id="whoami"></span>
+      <a class="nav-link" href="index.html">展览页</a>
+      <button class="nav-link" id="logoutBtn" style="background:none;border:none;font-size:.9rem">退出</button>
+    </div>
+  </nav>
+
+  <div class="admin-wrap">
+
+    <div class="mode-bar">
+      <span class="tag" id="modeTag"></span>
+      <span id="modeText"></span>
+    </div>
+
+    <!-- 上传 -->
+    <section class="panel">
+      <div class="panel-head">
+        <h2>📷 上传新照片</h2>
+        <span class="sub">支持多选，自动压缩后上传</span>
+      </div>
+      <div class="dropzone" id="dropzone">
+        <div class="dz-icon">🖼️</div>
+        <div class="dz-main">点击选择照片，或拖拽到此处</div>
+        <div class="dz-sub">JPG / PNG / WebP，手机原图即可，会自动压缩</div>
+      </div>
+      <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
+      <div class="bulk-loc">
+        <input class="input" id="bulkLoc" placeholder="统一地点（选填）：例如 成都 · 玉林路">
+        <button class="btn btn-ghost btn-sm" id="bulkLocBtn" type="button">应用到全部</button>
+      </div>
+      <div class="upload-list" id="uploadList"></div>
+      <div style="text-align:center;margin-top:20px">
+        <button class="btn btn-primary" id="uploadBtn" style="display:none;min-width:220px">全部上传</button>
+      </div>
+      <p class="dz-sub" id="uploadHint" style="margin-top:14px;text-align:center">上传后照片会自动更新到展览页</p>
+    </section>
+
+    <!-- 已有照片 -->
+    <section class="panel">
+      <div class="panel-head">
+        <h2>🖼️ 已有照片</h2>
+        <span class="sub" id="manageCount"></span>
+      </div>
+      <div class="manage-list" id="manageList"></div>
+    </section>
+
+    <!-- 设置 -->
+    <section class="panel">
+      <div class="panel-head">
+        <h2>⚙️ 存储设置</h2>
+        <span class="sub">决定照片存在哪里</span>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer">
+          <input type="radio" name="mode" id="radioLocal" style="margin-top:6px">
+          <span>
+            <b>本地演示模式</b><br>
+            <span style="font-size:.85rem;color:var(--ink-soft)">照片只保存在这台电脑的浏览器里，适合先体验流程。</span>
+          </span>
+        </label>
+        <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer">
+          <input type="radio" name="mode" id="radioGithub" style="margin-top:6px">
+          <span>
+            <b>GitHub 实时模式</b><br>
+            <span style="font-size:.85rem;color:var(--ink-soft)">照片写入 GitHub 仓库，任何设备打开展览页都能看到最新内容。</span>
+          </span>
+        </label>
+      </div>
+
+      <div style="margin-top:18px;padding-top:16px;border-top:1px dashed var(--line)">
+        <div class="field" style="margin-bottom:10px">
+          <label for="tokenInput">GitHub Token（仅存于你的浏览器）</label>
+          <div class="settings-row">
+            <input class="input" id="tokenInput" type="password" placeholder="ghp_ 或 github_pat_ 开头" autocomplete="off">
+            <button class="btn btn-primary" id="tokenSave">保存并验证</button>
+            <button class="btn btn-ghost" id="tokenClear">清除</button>
+          </div>
+        </div>
+        <div class="token-state" id="tokenState"></div>
+        <details style="margin-top:14px;font-size:.85rem;color:var(--ink-soft)">
+          <summary style="cursor:pointer;font-weight:500;color:var(--peach)">如何生成 Token？（展开查看）</summary>
+          <ol style="margin:10px 0 0 18px;line-height:1.9">
+            <li>打开 GitHub，右上角头像 → Settings → Developer settings → Personal access tokens</li>
+            <li>选择 <b>Fine-grained tokens</b>，点击 Generate new token</li>
+            <li>Token name 随意填写；Repository access 选择 <b>Only select repositories</b>，勾选 moment 仓库</li>
+            <li>Permissions 里把 <b>Contents</b> 设为 <b>Read and write</b>（Metadata 会自动跟随）</li>
+            <li>生成后把 token 粘贴到上方输入框，点击「保存并验证」</li>
+          </ol>
+        </details>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/store.js"></script>
+  <script src="assets/js/admin.js"></script>
+</body>
+</html>
