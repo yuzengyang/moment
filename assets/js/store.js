@@ -111,7 +111,7 @@ async function ghGetFile(path, auth = true) {
   const ctrl = new AbortController();
   const timer = setTimeout(function () { ctrl.abort(); }, 20000);
   try {
-    const res = await fetch(url, { headers: ghHeaders(auth), signal: ctrl.signal });
+    const res = await fetch(url, { headers: ghHeaders(auth), signal: ctrl.signal, cache: 'no-store' });
     if (res.status === 404) return null;
     if (!res.ok) throw new Error('GitHub 读取失败 (' + res.status + ')');
     const data = await res.json();
@@ -206,15 +206,15 @@ async function loadGithubPhotosAnon() {
 }
 
 async function loadGithubMetaAnon() {
-  // 渠道 1-3：Pages 静态（最稳，已构建）→ jsDelivr（CDN）→ raw（实时），无速率限制
+  // 渠道优先级：raw（实时，上传/删除后立即反映）→ jsDelivr（CDN）→ Pages 静态（最稳），无速率限制
   const urls = [
-    photoPagesUrl('photos.json'),
+    photoRawUrl('photos.json'),
     photoJsUrl('photos.json'),
-    photoRawUrl('photos.json')
+    photoPagesUrl('photos.json')
   ];
   for (let i = 0; i < urls.length; i++) {
     const ctrl = new AbortController();
-    const timer = setTimeout(function () { ctrl.abort(); }, 8000);
+    const timer = setTimeout(function () { ctrl.abort(); }, 6000);
     try {
       const res = await fetch(urls[i], { cache: 'no-store', signal: ctrl.signal });
       clearTimeout(timer);
@@ -226,7 +226,7 @@ async function loadGithubMetaAnon() {
   }
   // 渠道 3：GitHub API（base64，匿名限流 60 次/小时，仅作兜底）
   const ctrl = new AbortController();
-  const timer = setTimeout(function () { ctrl.abort(); }, 8000);
+  const timer = setTimeout(function () { ctrl.abort(); }, 6000);
   try {
     const f = await ghGetFile('photos.json', false);
     if (!f) return null;
