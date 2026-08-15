@@ -1,8 +1,19 @@
 {
   "version": 1,
-  "updated": "2026-08-15T07:52:51.789Z",
+  "updated": "2026-08-15T07:57:06.087Z",
   "updatedBy": "yuzengyang",
   "photos": [
+    {
+      "id": "20260815-155701-1kd",
+      "file": "photos/20260815-155701-1kd.jpg",
+      "location": "西安",
+      "date": "2025-04-29",
+      "caption": "有人问春天是什么，我就想起了你",
+      "author": "yuzengyang",
+      "tags": [],
+      "visibility": "public",
+      "created": "2026-08-15T07:57:01.017Z"
+    },
     {
       "id": "20260815-154758-gaj",
       "file": "photos/20260815-154758-gaj.jpg",
