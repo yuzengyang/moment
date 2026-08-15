@@ -272,15 +272,13 @@
       const idx = Number(item.dataset.i);
       const p = pendingItems[idx];
       if (!p || p.status !== 'ready' || !p.dataUrl) return;
-      const tags = [];
-      item.querySelectorAll('.tag-opt.active').forEach(function (b) { tags.push(b.dataset.key); });
       const catEl = item.querySelector('.cat-opt.active');
       entries.push({
         dataUrl: p.dataUrl,
         location: item.querySelector('.up-loc').value.trim(),
         date: item.querySelector('.up-date').value,
         caption: item.querySelector('textarea.up-cap').value.trim(),
-        tags: tags,
+        tags: [],
         category: catEl ? catEl.dataset.cat : '',
         author: currentUser
       });
