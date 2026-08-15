@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-08-15T13:55:27.134Z",
+  "updated": "2026-08-15T16:06:05.364Z",
   "updatedBy": "yuzengyang",
   "photos": [
     {
@@ -12,7 +12,8 @@
       "author": "yuzengyang",
       "tags": [],
       "visibility": "public",
-      "created": "2026-08-15T08:45:24.052Z"
+      "created": "2026-08-15T08:45:24.052Z",
+      "category": "scenery"
     },
     {
       "id": "20260815-164524-7mm",
