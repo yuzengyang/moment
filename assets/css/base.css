@@ -52,7 +52,7 @@ input, textarea, select { font-family: inherit; font-size: 1rem; color: var(--in
   border: 1px solid rgba(240, 223, 210, 0.9);
   border-radius: 999px;
   box-shadow: 0 6px 24px rgba(190, 140, 110, 0.10);
-  transition: padding .3s ease, box-shadow .3s ease, background .3s ease;
+  transition: max-width .3s cubic-bezier(.22,.9,.3,1), box-shadow .3s ease, background .3s ease;
 }
 .nav.compact {
   max-width: 920px;
