@@ -333,7 +333,7 @@
       item.className = 'manage-item';
       item.dataset.id = p.id;
 
-      const rawUrl = 'https://raw.githubusercontent.com/' + SITE.repoOwner + '/' + SITE.repoName + '/main/' + p.file;
+      const rawUrl = 'https://' + SITE.repoOwner + '.github.io/' + SITE.repoName + '/' + p.file;
 
       item.innerHTML =
         '<div class="m-thumb"><img src="' + rawUrl + '" alt=""></div>' +
@@ -362,11 +362,12 @@
       els.manageList.appendChild(item);
       const mImg = item.querySelector('.m-thumb img');
       mImg.addEventListener('error', function () {
-        if (mImg.src.indexOf('raw.githubusercontent.com') > -1) {
-          mImg.src = mImg.src.replace('raw.githubusercontent.com/', 'cdn.jsdelivr.net/gh/').replace('/main/', '@main/');
-        } else {
-          mImg.style.display = 'none';
-        }
+        const cur = mImg.src;
+        const m1 = cur.match(/https:\/\/([^/]+)\.github\.io\/([^/]+)\/(.+)/);
+        if (m1) { mImg.src = 'https://cdn.jsdelivr.net/gh/' + m1[1] + '/' + m1[2] + '@main/' + m1[3]; return; }
+        const m2 = cur.match(/https:\/\/cdn\.jsdelivr\.net\/gh\/([^/]+)\/([^@]+)@main\/(.+)/);
+        if (m2) { mImg.src = 'https://raw.githubusercontent.com/' + m2[1] + '/' + m2[2] + '/main/' + m2[3]; return; }
+        mImg.style.display = 'none';
       });
       // 本地演示模式下若 IndexedDB 有该照片，用本地图覆盖
       getBlobDB(p.id).then(function (blob) {
