@@ -4,7 +4,8 @@
   'use strict';
 
   let currentUser = '';
-  let pendingFiles = [];        // 待上传的 File 对象
+  let pendingItems = [];        // { file, dataUrl, status: processing|ready|error, error }
+  let processingNow = false;   // 预压缩进行中标记
   let editingId = null;         // 正在内联编辑的照片 id
 
   const els = {
@@ -133,33 +134,85 @@
 
   function addFiles(files) {
     if (!files.length) return;
-    pendingFiles = pendingFiles.concat(files);
+    files.forEach(function (f) {
+      pendingItems.push({ file: f, dataUrl: null, status: 'processing', error: '' });
+    });
     renderUploadList();
+    updateUploadBtnState();
+    processPending();
   }
 
   function removeFileAt(i) {
-    pendingFiles.splice(i, 1);
+    pendingItems.splice(i, 1);
     renderUploadList();
+    updateUploadBtnState();
+  }
+
+  /* 选照片后立即逐张压缩，处理完成才能上传（避免上传时才压缩出错） */
+  async function processPending() {
+    if (processingNow) return;
+    processingNow = true;
+    for (let i = 0; i < pendingItems.length; i++) {
+      const item = pendingItems[i];
+      if (item.status !== 'processing') continue;
+      try {
+        showProgress(Math.round(((i + 1) / pendingItems.length) * 100), '处理照片 ' + (i + 1) + '/' + pendingItems.length);
+        item.dataUrl = await compressImage(item.file);
+        item.status = 'ready';
+      } catch (e) {
+        item.status = 'error';
+        item.error = e.message;
+      }
+      renderUploadList();
+      updateUploadBtnState();
+    }
+    processingNow = false;
+    updateUploadBtnState();
+  }
+
+  function updateUploadBtnState() {
+    if (!pendingItems.length) {
+      els.uploadBtn.style.display = 'none';
+      els.uploadHint.style.display = '';
+      els.progressWrap.style.display = 'none';
+      return;
+    }
+    els.uploadBtn.style.display = '';
+    els.uploadHint.style.display = 'none';
+    const processing = pendingItems.filter(function (i) { return i.status === 'processing'; }).length;
+    const ready = pendingItems.filter(function (i) { return i.status === 'ready'; }).length;
+    if (processing > 0) {
+      els.uploadBtn.disabled = true;
+      els.uploadBtn.textContent = '照片处理中…（' + ready + '/' + pendingItems.length + '）';
+    } else {
+      els.uploadBtn.disabled = false;
+      els.uploadBtn.textContent = '全部上传（' + ready + ' 张）';
+    }
   }
 
   function renderUploadList() {
     els.uploadList.innerHTML = '';
-    els.uploadBtn.style.display = pendingFiles.length ? '' : 'none';
-    els.uploadHint.style.display = pendingFiles.length ? 'none' : '';
-    if (!pendingFiles.length) return;
+    if (!pendingItems.length) return;
 
-    pendingFiles.forEach(function (file, i) {
-      const item = document.createElement('div');
-      item.className = 'upload-item';
-      item.dataset.i = i;
+    pendingItems.forEach(function (item, i) {
+      const el = document.createElement('div');
+      el.className = 'upload-item';
+      el.dataset.i = i;
 
-      const url = URL.createObjectURL(file);
+      const url = URL.createObjectURL(item.file);
       const today = new Date();
       const iso = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
 
-      item.innerHTML =
+      const statusHtml = item.status === 'processing'
+        ? '<span class="up-status processing">处理中…</span>'
+        : item.status === 'error'
+          ? '<span class="up-status error">处理失败：' + esc(item.error) + '</span>'
+          : '<span class="up-status ready">✓ 已就绪，可以上传</span>';
+
+      el.innerHTML =
         '<div class="up-thumb"><img src="' + url + '" alt="预览"></div>' +
         '<div class="up-fields">' +
+          statusHtml +
           '<div class="up-row">' +
             '<div class="field" style="margin:0"><label>地点</label><input class="input up-loc" placeholder="例如：成都 · 玉林路" value=""></div>' +
             '<div class="field" style="margin:0"><label>日期</label><input class="input up-date" type="date" value="' + iso + '"></div>' +
@@ -176,15 +229,15 @@
           '<div style="text-align:right"><button class="btn btn-ghost btn-sm up-remove" type="button">移除</button></div>' +
         '</div>';
 
-      item.querySelector('.up-remove').addEventListener('click', function () { removeFileAt(i); });
-      item.querySelectorAll('.tag-opt').forEach(function (badge) {
+      el.querySelector('.up-remove').addEventListener('click', function () { removeFileAt(i); });
+      el.querySelectorAll('.tag-opt').forEach(function (badge) {
         badge.addEventListener('click', function () {
           const on = badge.classList.toggle('active');
           const c = companionByKey(badge.dataset.key);
           badge.style.borderColor = on && c ? c.color : '';
         });
       });
-      els.uploadList.appendChild(item);
+      els.uploadList.appendChild(el);
     });
   }
 
@@ -193,12 +246,12 @@
     const items = els.uploadList.querySelectorAll('.upload-item');
     items.forEach(function (item) {
       const idx = Number(item.dataset.i);
-      const file = pendingFiles[idx];
-      if (!file) return;
+      const p = pendingItems[idx];
+      if (!p || p.status !== 'ready' || !p.dataUrl) return;
       const tags = [];
       item.querySelectorAll('.tag-opt.active').forEach(function (b) { tags.push(b.dataset.key); });
       entries.push({
-        file: file,
+        dataUrl: p.dataUrl,
         location: item.querySelector('.up-loc').value.trim(),
         date: item.querySelector('.up-date').value,
         caption: item.querySelector('textarea.up-cap').value.trim(),
@@ -211,52 +264,44 @@
 
   async function doUpload() {
     if (els.uploadBtn.disabled) return;
+    const readyCount = pendingItems.filter(function (i) { return i.status === 'ready'; }).length;
+    if (!readyCount) {
+      toast('照片尚未处理完成，请稍候再试', 'err');
+      return;
+    }
     els.uploadBtn.disabled = true;
     els.uploadBtn.textContent = '正在准备…';
-    showProgress(2, '准备中');
     try {
       const entries = collectEntries();
-      if (!entries.length) { toast('先选几张照片吧', 'err'); return; }
+      if (!entries.length) { toast('没有可上传的照片', 'err'); return; }
 
-      // 压缩阶段：5% → 35%
-      const prepared = [];
-      for (let i = 0; i < entries.length; i++) {
-        const e = entries[i];
-        els.uploadBtn.textContent = '压缩第 ' + (i + 1) + '/' + entries.length + ' 张…';
-        const pct = Math.round(5 + (i / entries.length) * 30);
-        showProgress(pct, '压缩照片 ' + (i + 1) + '/' + entries.length);
-        const dataUrl = await compressImage(e.file);
-        prepared.push({
+      const prepared = entries.map(function (e) {
+        return {
           id: genId(),
-          dataUrl: dataUrl,
+          dataUrl: e.dataUrl,
           location: e.location,
           date: e.date,
           caption: e.caption,
           tags: e.tags,
           author: e.author
-        });
-      }
+        };
+      });
 
-      // 上传阶段：35% → 100%（逐张回调）
-      els.uploadBtn.textContent = '正在上传…';
       const result = await uploadPhotos(prepared, function (done, total) {
-        const pct = Math.round(35 + (done / total) * 60);
+        const pct = Math.round((done / total) * 100);
         showProgress(pct, '上传照片 ' + done + '/' + total);
         els.uploadBtn.textContent = '上传中 ' + done + '/' + total;
       });
       showProgress(100, '完成');
 
-      pendingFiles = [];
+      pendingItems = [];
       renderUploadList();
-      setTimeout(function () {
-        els.progressWrap.style.display = 'none';
-      }, 2500);
+      updateUploadBtnState();
+      setTimeout(function () { els.progressWrap.style.display = 'none'; }, 2500);
 
       const n = result.uploaded || 0;
       const failed = result.failed || [];
-      if (lsGet(MODE_KEY) === 'github' && !lsGet('om_token')) {
-        toast('照片已存入本机，配置 Token 后需重新上传才会同步到 GitHub', 'ok');
-      } else if (failed.length) {
+      if (failed.length) {
         toast('成功 ' + n + ' 张，失败 ' + failed.length + ' 张：' + failed[0].err, 'err');
       } else {
         toast('上传成功 ' + n + ' 张，展览页已更新', 'ok');
@@ -266,7 +311,7 @@
       toast('上传失败：' + err.message, 'err');
     } finally {
       els.uploadBtn.disabled = false;
-      els.uploadBtn.textContent = '全部上传';
+      updateUploadBtnState();
     }
   }
 
@@ -288,12 +333,10 @@
       item.className = 'manage-item';
       item.dataset.id = p.id;
 
-      const url = detectMode() === 'github'
-        ? 'https://raw.githubusercontent.com/' + SITE.repoOwner + '/' + SITE.repoName + '/main/' + p.file
-        : '';
+      const rawUrl = 'https://raw.githubusercontent.com/' + SITE.repoOwner + '/' + SITE.repoName + '/main/' + p.file;
 
       item.innerHTML =
-        '<div class="m-thumb"><img src="' + url + '" alt="" onerror="this.style.display=\'none\'"></div>' +
+        '<div class="m-thumb"><img src="' + rawUrl + '" alt="" onerror="this.style.display=\'none\'"></div>' +
         '<div class="m-info">' +
           '<div class="m-loc">' + esc(p.location || '地点待补充') + '</div>' +
           '<div class="m-cap">' + esc(p.caption || '没有留下文字') + '</div>' +
@@ -317,11 +360,10 @@
       });
 
       els.manageList.appendChild(item);
-      if (detectMode() !== 'github' && p.id) {
-        getBlobDB(p.id).then(function (blob) {
-          if (blob) item.querySelector('.m-thumb img').src = URL.createObjectURL(blob);
-        });
-      }
+      // 本地演示模式下若 IndexedDB 有该照片，用本地图覆盖
+      getBlobDB(p.id).then(function (blob) {
+        if (blob) item.querySelector('.m-thumb img').src = URL.createObjectURL(blob);
+      });
     });
   }
 
