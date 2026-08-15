@@ -238,11 +238,29 @@ async function loadGithubMetaAnon() {
 /* 展览页统一入口：返回 { photos, source } */
 /* 顺序：GitHub 实时（匿名可读，不依赖任何本地设置）→ 本地 IndexedDB（演示）→ 静态文件 */
 async function loadGalleryPhotos() {
+  // 浏览器有 Token 时用认证读取（实时），本人操作后立即看到最新
+  if (lsGet(TOKEN_KEY)) {
+    try {
+      const f = await ghGetFile('photos.json', true);
+      if (f) {
+        const data = JSON.parse(f.content);
+        if (Array.isArray(data.photos) && data.photos.length) {
+          return {
+            photos: data.photos.map(function (p) {
+              return Object.assign({}, p, { url: photoRawUrl(p.file) });
+            }),
+            source: 'github-live'
+          };
+        }
+      }
+    } catch (e) { /* 走匿名渠道 */ }
+  }
+
   const fresh = await loadGithubPhotosAnon();
   if (fresh && fresh.length) {
     return {
       photos: fresh.map(function (p) {
-        return Object.assign({}, p, { url: photoPagesUrl(p.file) });
+        return Object.assign({}, p, { url: photoRawUrl(p.file) });
       }),
       source: 'github-live'
     };
