@@ -146,11 +146,27 @@
   function addFiles(files) {
     if (!files.length) return;
     files.forEach(function (f) {
-      pendingItems.push({ file: f, dataUrl: null, status: 'processing', error: '' });
+      pendingItems.push({ file: f, dataUrl: null, status: 'processing', error: '', exifDate: null });
     });
     renderUploadList();
     updateUploadBtnState();
     processPending();
+
+    // 异步读取每张照片的 EXIF 拍摄日期，回填到日期输入框
+    pendingItems.forEach(function (item, idx) {
+      readExifDate(item.file).then(function (d) {
+        if (!d || pendingItems[idx] !== item) return;
+        item.exifDate = d;
+        const rows = els.uploadList.querySelectorAll('.upload-item');
+        for (let r = 0; r < rows.length; r++) {
+          if (Number(rows[r].dataset.i) === idx) {
+            const inp = rows[r].querySelector('.up-date');
+            if (inp) inp.value = d;
+            break;
+          }
+        }
+      });
+    });
   }
 
   function removeFileAt(i) {
