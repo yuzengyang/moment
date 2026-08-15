@@ -115,12 +115,14 @@
 .modal-info .m-count { font-size: 0.78rem; color: var(--ink-soft); opacity: 0.8; margin-bottom: 10px; letter-spacing: 0.05em; }
 .modal-info .m-meta { margin-top: auto; padding-top: 16px; border-top: 1px dashed var(--line); display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; color: var(--ink-soft); }
 .modal-close {
-  position: absolute; top: 0; right: 0; transform: translate(14px, -14px);
+  position: absolute; top: 14px; right: 14px; z-index: 6;
   width: 40px; height: 40px; border-radius: 50%; border: none;
-  background: #fff; color: var(--ink); font-size: 1.15rem; box-shadow: var(--shadow);
-  display: flex; align-items: center; justify-content: center; transition: transform .2s ease;
+  background: rgba(255, 255, 255, 0.96); color: var(--ink); font-size: 1.1rem;
+  box-shadow: 0 6px 18px rgba(60, 40, 30, 0.28);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .2s ease, background .2s ease, color .2s ease;
 }
-.modal-close:hover { transform: translate(14px, -14px) rotate(90deg); }
+.modal-close:hover { background: var(--peach); color: #fff; transform: rotate(90deg); }
 .modal-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; border: none; background: rgba(255, 255, 255, 0.92); box-shadow: var(--shadow); font-size: 1.2rem; color: var(--ink); display: flex; align-items: center; justify-content: center; transition: transform .2s ease, background .2s ease; }
 .modal-nav:hover { background: #fff; transform: translateY(-50%) scale(1.08); }
 .modal-nav.prev { left: 14px; }
