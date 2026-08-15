@@ -369,7 +369,7 @@ async function updatePhoto(id, patch, user) {
   if (idx === -1) return;
   photos[idx] = Object.assign({}, photos[idx], patch);
 
-  if (detectMode() === 'github') {
+  if (lsGet(TOKEN_KEY)) {
     await ghPutFile('photos.json', JSON.stringify({ version: 1, updated: new Date().toISOString(), updatedBy: user || '', photos: photos }, null, 2), '编辑照片 ' + id);
   } else {
     saveLocalMeta(photos, user);
@@ -382,7 +382,7 @@ async function deletePhoto(id, user) {
   const target = photos.find(function (p) { return p.id === id; });
   if (!target) return;
 
-  if (detectMode() === 'github') {
+  if (lsGet(TOKEN_KEY)) {
     await ghDeleteFile(target.file, '删除照片 ' + id);
     const rest = photos.filter(function (p) { return p.id !== id; });
     await ghPutFile('photos.json', JSON.stringify({ version: 1, updated: new Date().toISOString(), updatedBy: user || '', photos: rest }, null, 2), '删除照片 ' + id);
