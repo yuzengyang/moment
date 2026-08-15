@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-08-15T07:35:06.261Z",
+  "updated": "2026-08-15T07:35:09.640Z",
   "updatedBy": "yuzengyang",
   "photos": [
     {
@@ -94,15 +94,14 @@
       "created": "2026-08-15T03:47:35.740Z"
     },
     {
-      "id": "20260815-113251-9b5",
-      "file": "photos/20260815-113251-9b5.jpg",
+      "id": "20260815-104320-x0g",
+      "file": "photos/20260815-104320-x0g.jpg",
       "location": "",
       "date": "2026-08-15",
       "caption": "",
       "author": "yuzengyang",
       "tags": [],
-      "created": "2026-08-15T03:32:51.317Z",
-      "visibility": "private"
+      "created": "2026-08-15T02:43:20.985Z"
     }
   ]
 }
