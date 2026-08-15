@@ -16,6 +16,14 @@ const DB_STORE = 'photos';
 
 const GH_API = 'https://api.github.com';
 const GH_RAW = 'https://raw.githubusercontent.com';
+const GH_JSD = 'https://cdn.jsdelivr.net/gh';
+
+function photoRawUrl(file) {
+  return GH_RAW + '/' + SITE.repoOwner + '/' + SITE.repoName + '/main/' + file;
+}
+function photoJsUrl(file) {
+  return GH_JSD + '/' + SITE.repoOwner + '/' + SITE.repoName + '@main/' + file;
+}
 
 /* ---------- 模式与配置 ---------- */
 
@@ -194,6 +202,24 @@ async function loadGithubPhotosAnon() {
 }
 
 async function loadGithubMetaAnon() {
+  // 渠道 1+2：raw（实时）与 jsDelivr（国内 CDN 稳），无速率限制
+  const urls = [
+    photoRawUrl('photos.json'),
+    photoJsUrl('photos.json')
+  ];
+  for (let i = 0; i < urls.length; i++) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(function () { ctrl.abort(); }, 8000);
+    try {
+      const res = await fetch(urls[i], { cache: 'no-store', signal: ctrl.signal });
+      clearTimeout(timer);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.photos) return data;
+      }
+    } catch (e) { clearTimeout(timer); /* 尝试下一渠道 */ }
+  }
+  // 渠道 3：GitHub API（base64，匿名限流 60 次/小时，仅作兜底）
   const ctrl = new AbortController();
   const timer = setTimeout(function () { ctrl.abort(); }, 8000);
   try {
@@ -211,7 +237,7 @@ async function loadGalleryPhotos() {
   if (fresh && fresh.length) {
     return {
       photos: fresh.map(function (p) {
-        return Object.assign({}, p, { url: GH_RAW + '/' + SITE.repoOwner + '/' + SITE.repoName + '/main/' + p.file });
+        return Object.assign({}, p, { url: photoRawUrl(p.file) });
       }),
       source: 'github-live'
     };
@@ -238,8 +264,18 @@ async function loadGalleryPhotos() {
 
 /* 管理页统一入口：返回完整照片列表（github 模式含实时数据） */
 async function loadPhotos() {
-  const fresh = await loadGithubPhotosAnon();
-  if (fresh) return fresh;
+  // 管理页有 Token：走认证读取，不受匿名限流影响
+  if (getToken()) {
+    try {
+      const f = await ghGetFile('photos.json', true);
+      if (f) {
+        const data = JSON.parse(f.content);
+        if (Array.isArray(data.photos)) return data.photos;
+      }
+    } catch (e) { /* 走匿名渠道兜底 */ }
+  }
+  const m = await loadGithubMetaAnon();
+  if (m && Array.isArray(m.photos)) return m.photos;
   if (localMeta().length) return localMeta();
   return (await loadStaticPhotos()) || [];
 }
