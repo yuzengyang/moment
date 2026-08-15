@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>温琳舒 ♥ 于增洋 · 我们的时光簿</title>
+  <meta name="description" content="温琳舒与于增洋的日常美食与风景相册">
+  <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/gallery.css">
+</head>
+<body class="page-gallery">
+
+  <nav class="nav">
+    <a class="brand" href="index.html">
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#FFB6A3"/><stop offset="1" stop-color="#F2767E"/>
+        </linearGradient></defs>
+        <path d="M32 38.5c-6.8-3.8-10.7-7.6-10.7-11.9 0-3.3 2.5-5.7 5.6-5.7 2.1 0 4.1 1.2 5.1 2.9 1-1.7 3-2.9 5.1-2.9 3.1 0 5.6 2.4 5.6 5.7 0 4.3-3.9 8.1-10.7 11.9z" fill="url(#lg)"/>
+      </svg>
+      <span>我们的时光簿<span class="brand-sub">Wen &amp; Yu</span></span>
+    </a>
+    <div class="nav-links">
+      <a class="nav-link" href="login.html">登录管理</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="float f-heart">
+      <svg viewBox="0 0 24 24" width="30" height="30" fill="#F2767E" opacity="0.5"><path d="M12 21s-7-4.6-9.3-9A5.4 5.4 0 0 1 12 6.3 5.4 5.4 0 0 1 21.3 12C19 16.4 12 21 12 21z"/></svg>
+    </div>
+    <div class="float f-star1">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="#9DBE8B" opacity="0.6"><path d="M12 2l2.6 6.4L21 11l-6.4 2.6L12 20l-2.6-6.4L3 11l6.4-2.6z"/></svg>
+    </div>
+    <div class="float f-star2">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="#8FB6CE" opacity="0.55"><path d="M12 2l2.6 6.4L21 11l-6.4 2.6L12 20l-2.6-6.4L3 11l6.4-2.6z"/></svg>
+    </div>
+    <div class="float f-cloud">
+      <svg viewBox="0 0 24 24" width="44" height="44" fill="#fff" opacity="0.75"><path d="M7 18a4 4 0 1 1 .6-7.95A5.5 5.5 0 0 1 18.5 9.5 4.5 4.5 0 0 1 17 18H7z"/></svg>
+    </div>
+
+    <h1>温琳舒 <span class="amp">&amp;</span> 于增洋</h1>
+    <p class="subtitle">一起走过的美食与风景，都在这里</p>
+    <div class="hero-photos">
+      <img src="photos/20260815-001.jpg" alt="我们的照片" loading="lazy">
+      <img class="mid" src="photos/20260815-002.jpg" alt="我们的照片" loading="lazy">
+      <img src="photos/20260815-003.jpg" alt="我们的照片" loading="lazy">
+    </div>
+  </header>
+
+  <div class="stats-bar">
+    <span class="count" id="photoCount">加载中…</span>
+    <span class="sync" id="syncState"></span>
+  </div>
+
+  <main class="masonry" id="grid"></main>
+
+  <div class="empty-state" id="emptyState" style="display:none">
+    <div class="hearts">
+      <svg viewBox="0 0 24 24" width="34" height="34" fill="#FFB6A3"><path d="M12 21s-7-4.6-9.3-9A5.4 5.4 0 0 1 12 6.3 5.4 5.4 0 0 1 21.3 12C19 16.4 12 21 12 21z"/></svg>
+      <svg viewBox="0 0 24 24" width="44" height="44" fill="#F2767E"><path d="M12 21s-7-4.6-9.3-9A5.4 5.4 0 0 1 12 6.3 5.4 5.4 0 0 1 21.3 12C19 16.4 12 21 12 21z"/></svg>
+      <svg viewBox="0 0 24 24" width="34" height="34" fill="#FFB6A3"><path d="M12 21s-7-4.6-9.3-9A5.4 5.4 0 0 1 12 6.3 5.4 5.4 0 0 1 21.3 12C19 16.4 12 21 12 21z"/></svg>
+    </div>
+    <h3>还没有照片</h3>
+    <p>第一段时光，等你来记录。<a href="login.html">去登录上传</a></p>
+  </div>
+
+  <!-- 照片详情弹窗 -->
+  <div class="modal-backdrop" id="modal" aria-hidden="true">
+    <div class="modal">
+      <button class="modal-close" id="modalClose" aria-label="关闭">✕</button>
+      <button class="modal-nav prev" id="modalPrev" aria-label="上一张">‹</button>
+      <button class="modal-nav next" id="modalNext" aria-label="下一张">›</button>
+      <div class="modal-body">
+        <div class="modal-photo"><img id="modalImg" alt="照片"></div>
+        <div class="modal-info">
+          <div class="m-count" id="modalCount"></div>
+          <div class="m-loc">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span id="modalLoc"></span>
+          </div>
+          <div class="m-date" id="modalDate"></div>
+          <div class="m-cap" id="modalCap"></div>
+          <div class="badge-row" id="modalBadges"></div>
+          <div class="m-meta">
+            <span id="modalWho"></span>
+            <span>Our Moments</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="updated" id="updatedInfo"></div>
+    <div class="copy">温琳舒 <span class="heart">♥</span> 于增洋 · Our Moments</div>
+  </footer>
+
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/store.js"></script>
+  <script src="assets/js/gallery.js"></script>
+</body>
+</html>
