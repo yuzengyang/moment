@@ -94,8 +94,18 @@
 .photo-card .meta .date { font-size: 0.78rem; color: var(--ink-soft); }
 .photo-card .meta .who { font-size: 0.78rem; color: var(--peach); font-weight: 500; }
 
-.more-wrap { text-align: center; margin: 26px 0 8px; }
-.more-wrap .btn { min-width: 180px; }
+.more-wrap { text-align: center; margin: 30px 0 12px; }
+.more-wrap .btn {
+  min-width: 140px; padding: 11px 30px;
+  border: 1.5px solid var(--peach-soft); color: var(--peach);
+  background: rgba(255, 255, 255, 0.7); font-weight: 500; letter-spacing: 0.1em;
+  border-radius: 999px; transition: all .25s ease;
+}
+.more-wrap .btn:hover {
+  background: var(--peach); color: #fff; border-color: var(--peach);
+  box-shadow: 0 8px 20px rgba(242, 118, 126, 0.28); transform: translateY(-1px);
+}
+.more-wrap .m-arrow { font-size: 0.85em; margin-left: 4px; display: inline-block; }
 
 /* ---------- 空状态 ---------- */
 .empty-state { text-align: center; padding: 90px 20px 100px; color: var(--ink-soft); }
