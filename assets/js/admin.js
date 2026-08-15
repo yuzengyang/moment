@@ -455,14 +455,24 @@
     setupDropzone();
     setupBulkLoc();
     setupSettings();
-    els.uploadBtn.addEventListener('click', doUpload);
-    document.getElementById('logoutBtn').addEventListener('click', function () {
-      sessionStorage.removeItem('om_session');
-      sessionStorage.removeItem('om_session_name');
-      location.href = 'index.html';
-    });
     refreshManageList();
   }
 
-  init();
+  /* 关键按钮用事件委托，即使初始化某步出错也能响应 */
+  document.addEventListener('click', function (e) {
+    const t = e.target;
+    if (!t || !t.closest) return;
+    if (t.closest('#uploadBtn')) { doUpload(); return; }
+    if (t.closest('#logoutBtn')) {
+      sessionStorage.removeItem('om_session');
+      sessionStorage.removeItem('om_session_name');
+      location.href = 'index.html';
+    }
+  });
+
+  try {
+    init();
+  } catch (err) {
+    toast('初始化出错：' + err.message, 'err');
+  }
 })();
