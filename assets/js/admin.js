@@ -27,7 +27,10 @@
     tokenSave: document.getElementById('tokenSave'),
     tokenClear: document.getElementById('tokenClear'),
     tokenState: document.getElementById('tokenState'),
-    toast: document.getElementById('toast')
+    toast: document.getElementById('toast'),
+    progressWrap: document.getElementById('progressWrap'),
+    progressFill: document.getElementById('progressFill'),
+    progressText: document.getElementById('progressText')
   };
 
   let toastTimer = null;
@@ -36,6 +39,13 @@
     els.toast.className = 'toast show' + (kind ? ' ' + kind : '');
     clearTimeout(toastTimer);
     toastTimer = setTimeout(function () { els.toast.className = 'toast'; }, 5000);
+  }
+
+  function showProgress(pct, text) {
+    if (!els.progressWrap) return;
+    els.progressWrap.style.display = 'block';
+    els.progressFill.style.width = pct + '%';
+    els.progressText.textContent = (text || '') + (pct > 0 ? '（' + pct + '%）' : '');
   }
 
   /* 全局错误捕获：任何未捕获错误都弹出，便于定位 */
@@ -203,16 +213,18 @@
     if (els.uploadBtn.disabled) return;
     els.uploadBtn.disabled = true;
     els.uploadBtn.textContent = '正在准备…';
+    showProgress(2, '准备中');
     try {
       const entries = collectEntries();
       if (!entries.length) { toast('先选几张照片吧', 'err'); return; }
-      toast('开始处理 ' + entries.length + ' 张照片…', 'ok');
 
-      // 逐张压缩
+      // 压缩阶段：5% → 35%
       const prepared = [];
       for (let i = 0; i < entries.length; i++) {
         const e = entries[i];
         els.uploadBtn.textContent = '压缩第 ' + (i + 1) + '/' + entries.length + ' 张…';
+        const pct = Math.round(5 + (i / entries.length) * 30);
+        showProgress(pct, '压缩照片 ' + (i + 1) + '/' + entries.length);
         const dataUrl = await compressImage(e.file);
         prepared.push({
           id: genId(),
@@ -224,13 +236,28 @@
           author: e.author
         });
       }
-      els.uploadBtn.textContent = '写入照片 ' + prepared.length + ' 张…';
-      toast('照片处理完成，正在写入…', 'ok');
-      const n = await uploadPhotos(prepared);
+
+      // 上传阶段：35% → 100%（逐张回调）
+      els.uploadBtn.textContent = '正在上传…';
+      const result = await uploadPhotos(prepared, function (done, total) {
+        const pct = Math.round(35 + (done / total) * 60);
+        showProgress(pct, '上传照片 ' + done + '/' + total);
+        els.uploadBtn.textContent = '上传中 ' + done + '/' + total;
+      });
+      showProgress(100, '完成');
+
       pendingFiles = [];
       renderUploadList();
+      setTimeout(function () {
+        els.progressWrap.style.display = 'none';
+      }, 2500);
+
+      const n = result.uploaded || 0;
+      const failed = result.failed || [];
       if (lsGet(MODE_KEY) === 'github' && !lsGet('om_token')) {
         toast('照片已存入本机，配置 Token 后需重新上传才会同步到 GitHub', 'ok');
+      } else if (failed.length) {
+        toast('成功 ' + n + ' 张，失败 ' + failed.length + ' 张：' + failed[0].err, 'err');
       } else {
         toast('上传成功 ' + n + ' 张，展览页已更新', 'ok');
       }
