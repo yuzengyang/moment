@@ -1,8 +1,19 @@
 {
   "version": 1,
-  "updated": "2026-08-15T08:11:42.182Z",
+  "updated": "2026-08-15T08:12:34.806Z",
   "updatedBy": "yuzengyang",
   "photos": [
+    {
+      "id": "20260815-161228-zv0",
+      "file": "photos/20260815-161228-zv0.jpg",
+      "location": "武汉",
+      "date": "2025-11-10",
+      "caption": "",
+      "author": "yuzengyang",
+      "tags": [],
+      "visibility": "public",
+      "created": "2026-08-15T08:12:28.581Z"
+    },
     {
       "id": "20260815-161137-tum",
       "file": "photos/20260815-161137-tum.jpg",
