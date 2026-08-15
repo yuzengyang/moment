@@ -1,6 +1,17 @@
 {
   "version": 1,
-  "updated": "2026-08-15T10:27:00.000Z",
-  "photos": [],
-  "updatedBy": ""
+  "updated": "2026-08-15T02:30:26.825Z",
+  "updatedBy": "yuzengyang",
+  "photos": [
+    {
+      "id": "20260815-103023-38g",
+      "file": "photos/20260815-103023-38g.jpg",
+      "location": "",
+      "date": "2026-08-15",
+      "caption": "",
+      "author": "yuzengyang",
+      "tags": [],
+      "created": "2026-08-15T02:30:26.825Z"
+    }
+  ]
 }
