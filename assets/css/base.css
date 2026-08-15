@@ -52,7 +52,16 @@ input, textarea, select { font-family: inherit; font-size: 1rem; color: var(--in
   border: 1px solid rgba(240, 223, 210, 0.9);
   border-radius: 999px;
   box-shadow: 0 6px 24px rgba(190, 140, 110, 0.10);
+  transition: padding .3s ease, box-shadow .3s ease, background .3s ease;
 }
+.nav.compact {
+  padding: 6px 20px;
+  background: rgba(255, 253, 250, 0.96);
+  box-shadow: 0 8px 28px rgba(190, 140, 110, 0.20);
+}
+.nav.compact .brand { font-size: 0.95rem; }
+.nav.compact .brand svg { width: 22px; height: 22px; }
+.nav.compact .brand .brand-sub { font-size: 0.72rem; }
 .brand { display: flex; align-items: center; gap: 12px; font-family: "KaiTi", "STKaiti", "Kaiti SC", "楷体", "KaiTi_GB2312", serif; font-size: 1.1rem; letter-spacing: 0.14em; }
 .brand svg { width: 26px; height: 26px; flex: none; }
 .brand .brand-sub {
