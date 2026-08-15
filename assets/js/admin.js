@@ -31,6 +31,7 @@
     toast: document.getElementById('toast'),
     msgList: document.getElementById('msgList'),
     msgCount: document.getElementById('msgCount'),
+    yearFilter: document.getElementById('yearFilter'),
     progressWrap: document.getElementById('progressWrap'),
     progressFill: document.getElementById('progressFill'),
     progressText: document.getElementById('progressText')
@@ -330,8 +331,41 @@
 
   /* ---------- 已有照片管理 ---------- */
 
+  let filterYear = 'all';
+
+  function renderYearFilter(allPhotos) {
+    const years = {};
+    allPhotos.forEach(function (p) {
+      const y = (p.date || p.created || '').substring(0, 4);
+      if (y) years[y] = true;
+    });
+    const ys = Object.keys(years).sort().reverse();
+    if (filterYear !== 'all' && !years[filterYear]) filterYear = 'all';
+    if (!ys.length) {
+      els.yearFilter.style.display = 'none';
+      els.yearFilter.innerHTML = '';
+      return;
+    }
+    els.yearFilter.style.display = '';
+    const html = ['<button class="yr-chip' + (filterYear === 'all' ? ' active' : '') + '" data-y="all">全部</button>']
+      .concat(ys.map(function (y) {
+        return '<button class="yr-chip' + (filterYear === y ? ' active' : '') + '" data-y="' + y + '">' + y + '</button>';
+      })).join('');
+    els.yearFilter.innerHTML = html;
+    els.yearFilter.querySelectorAll('.yr-chip').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        filterYear = btn.dataset.y;
+        refreshManageList();
+      });
+    });
+  }
+
   async function refreshManageList() {
-    const photos = await loadPhotos();
+    const allPhotos = await loadPhotos();
+    renderYearFilter(allPhotos);
+    const photos = filterYear === 'all' ? allPhotos : allPhotos.filter(function (p) {
+      return (p.date || p.created || '').substring(0, 4) === filterYear;
+    });
     els.manageCount.textContent = '共 ' + photos.length + ' 张';
     els.manageList.innerHTML = '';
 
