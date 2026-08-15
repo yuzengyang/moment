@@ -349,10 +349,17 @@
 
       item.querySelector('.op-del').addEventListener('click', function () {
         if (!confirm('确定删除这张照片吗？')) return;
+        const btn = this;
+        btn.disabled = true;
+        btn.textContent = '删除中…';
         deletePhoto(p.id, currentUser).then(function () {
-          toast('已删除', 'ok');
+          toast('已删除，展览页将自动更新', 'ok');
           refreshManageList();
-        }).catch(function (err) { toast('删除失败：' + err.message, 'err'); });
+        }).catch(function (err) {
+          toast('删除失败：' + err.message, 'err');
+          btn.disabled = false;
+          btn.textContent = '删除';
+        });
       });
 
       item.querySelector('.op-edit').addEventListener('click', function () {
