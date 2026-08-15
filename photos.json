@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-08-15T16:21:24.844Z",
+  "updated": "2026-08-15T16:21:37.268Z",
   "updatedBy": "yuzengyang",
   "photos": [
     {
@@ -248,7 +248,8 @@
       "author": "yuzengyang",
       "tags": [],
       "visibility": "public",
-      "created": "2026-08-15T07:57:01.017Z"
+      "created": "2026-08-15T07:57:01.017Z",
+      "category": "scenery"
     },
     {
       "id": "20260815-154758-gaj",
