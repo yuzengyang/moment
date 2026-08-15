@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-08-15T02:40:30.735Z",
+  "updated": "2026-08-15T02:40:35.269Z",
   "updatedBy": "yuzengyang",
   "photos": [
     {
@@ -32,18 +32,6 @@
       "author": "yuzengyang",
       "tags": [],
       "created": "2026-08-15T02:32:47.473Z"
-    },
-    {
-      "id": "20260815-103118-bgk",
-      "file": "photos/20260815-103118-bgk.jpg",
-      "location": "z",
-      "date": "2026-08-15",
-      "caption": "11",
-      "author": "yuzengyang",
-      "tags": [
-        "lulu"
-      ],
-      "created": "2026-08-15T02:31:21.726Z"
     }
   ]
 }
