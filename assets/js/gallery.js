@@ -62,7 +62,7 @@
       '</div>' +
       '<div class="meta">' + capHtml +
         '<div class="row">' +
-          '<span class="date">' + esc(fmtDate(p.date || p.created)) + (p.category ? ' · ' + esc(categoryName(p.category)) : '') + '</span>' +
+          '<span class="date">' + esc(fmtDate(p.date || p.created)) + (p.category ? ' · <span style="color:' + categoryColor(p.category) + '">' + esc(categoryName(p.category)) + '</span>' : '') + '</span>' +
           (p.author ? '<span class="who">' + esc(authorName(p.author)) + ' 记录</span>' : '') +
         '</div>' +
       '</div>';
