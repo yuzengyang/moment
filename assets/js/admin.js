@@ -29,6 +29,8 @@
     tokenClear: document.getElementById('tokenClear'),
     tokenState: document.getElementById('tokenState'),
     toast: document.getElementById('toast'),
+    msgList: document.getElementById('msgList'),
+    msgCount: document.getElementById('msgCount'),
     progressWrap: document.getElementById('progressWrap'),
     progressFill: document.getElementById('progressFill'),
     progressText: document.getElementById('progressText')
@@ -394,6 +396,37 @@
     });
   }
 
+  /* 留言管理 */
+  async function refreshMsgList() {
+    const msgs = await loadMessages();
+    els.msgCount.textContent = '共 ' + msgs.length + ' 条';
+    els.msgList.innerHTML = '';
+    if (!msgs.length) {
+      els.msgList.innerHTML = '<p style="color:var(--ink-soft);font-size:.88rem;padding:10px 0">还没有留言。</p>';
+      return;
+    }
+    msgs.forEach(function (m) {
+      const item = document.createElement('div');
+      item.className = 'manage-item';
+      item.innerHTML =
+        '<div class="gb-avatar">' + esc((m.name || '匿').charAt(0)) + '</div>' +
+        '<div class="m-info">' +
+          '<div class="m-loc">' + esc(m.name || '匿名') + ' <span style="font-weight:400;font-size:.78rem;color:var(--ink-soft)">' + esc(fmtDateTime(m.time)) + '</span></div>' +
+          '<div class="m-cap" style="white-space:pre-wrap">' + esc(m.content) + '</div>' +
+        '</div>' +
+        '<div class="m-ops"><button class="btn btn-danger btn-sm op-msg-del">删除</button></div>';
+      item.querySelector('.op-msg-del').addEventListener('click', function () {
+        if (!confirm('删除这条留言？')) return;
+        deleteMessage(m.id).then(function () {
+          toast('留言已删除', 'ok');
+          refreshMsgList();
+          notifySync();
+        }).catch(function (err) { toast('删除失败：' + err.message, 'err'); });
+      });
+      els.msgList.appendChild(item);
+    });
+  }
+
   /* 内联编辑 */
   function startEdit(id, p) {
     editingId = id;
@@ -553,6 +586,7 @@
     setupBulkLoc();
     setupSettings();
     refreshManageList();
+    refreshMsgList();
   }
 
   /* 关键按钮用事件委托，即使初始化某步出错也能响应 */
