@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-08-15T16:09:12.235Z",
+  "updated": "2026-08-15T16:09:23.350Z",
   "updatedBy": "yuzengyang",
   "photos": [
     {
@@ -117,7 +117,8 @@
       "author": "yuzengyang",
       "tags": [],
       "visibility": "public",
-      "created": "2026-08-15T08:07:33.637Z"
+      "created": "2026-08-15T08:07:33.637Z",
+      "category": "food"
     },
     {
       "id": "20260815-160559-ow3",
