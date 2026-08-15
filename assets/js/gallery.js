@@ -7,6 +7,7 @@
   let currentIndex = -1;
   const SHOW_INITIAL = 12;   // 主页默认展示最新 12 张
   let expanded = false;      // 是否展开全部
+  let filterCategory = 'all'; // 分类筛选：all | scenery | food
 
   const grid = document.getElementById('grid');
   const countEl = document.getElementById('photoCount');
@@ -61,7 +62,7 @@
       '</div>' +
       '<div class="meta">' + capHtml +
         '<div class="row">' +
-          '<span class="date">' + esc(fmtDate(p.date || p.created)) + '</span>' +
+          '<span class="date">' + esc(fmtDate(p.date || p.created)) + (p.category ? ' · ' + esc(categoryName(p.category)) : '') + '</span>' +
           (p.author ? '<span class="who">' + esc(authorName(p.author)) + ' 记录</span>' : '') +
         '</div>' +
       '</div>';
@@ -80,16 +81,20 @@
     countEl.innerHTML = '<b>' + photos.length + '</b> 段时光';
     syncEl.style.display = 'none';
 
-    const visible = expanded ? photos : photos.slice(0, SHOW_INITIAL);
+    const filtered = filterCategory === 'all'
+      ? photos
+      : photos.filter(function (p) { return p.category === filterCategory; });
+    const visible = expanded ? filtered : filtered.slice(0, SHOW_INITIAL);
     visible.forEach(function (p, idx) { buildCard(p, idx); });
     lazyLoad();
 
     const moreWrap = document.getElementById('moreWrap');
     const moreBtn = document.getElementById('moreBtn');
-    if (photos.length > SHOW_INITIAL && moreWrap) {
+    const shownTotal = filterCategory === 'all' ? photos.length : filtered.length;
+    if (shownTotal > SHOW_INITIAL && moreWrap) {
       moreWrap.style.display = 'block';
       moreBtn.innerHTML = expanded ? '收起 <span class="m-arrow">▴</span>' : '更多 <span class="m-arrow">▾</span>';
-      moreBtn.title = '还有 ' + (photos.length - SHOW_INITIAL) + ' 张照片';
+      moreBtn.title = '还有 ' + (shownTotal - SHOW_INITIAL) + ' 张照片';
     } else if (moreWrap) {
       moreWrap.style.display = 'none';
     }
@@ -213,6 +218,20 @@
   if (moreBtn) {
     moreBtn.addEventListener('click', function () {
       expanded = !expanded;
+      render();
+    });
+  }
+
+  const catFilter = document.getElementById('catFilter');
+  if (catFilter) {
+    catFilter.addEventListener('click', function (e) {
+      const chip = e.target.closest ? e.target.closest('.cat-chip') : null;
+      if (!chip) return;
+      filterCategory = chip.dataset.cat;
+      expanded = false;
+      catFilter.querySelectorAll('.cat-chip').forEach(function (c) {
+        c.classList.toggle('active', c === chip);
+      });
       render();
     });
   }
