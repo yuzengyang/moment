@@ -1,8 +1,19 @@
 {
   "version": 1,
-  "updated": "2026-08-15T08:04:15.641Z",
+  "updated": "2026-08-15T08:05:01.648Z",
   "updatedBy": "yuzengyang",
   "photos": [
+    {
+      "id": "20260815-160455-qmq",
+      "file": "photos/20260815-160455-qmq.jpg",
+      "location": "烟台",
+      "date": "2025-07-10",
+      "caption": "",
+      "author": "yuzengyang",
+      "tags": [],
+      "visibility": "public",
+      "created": "2026-08-15T08:04:55.315Z"
+    },
     {
       "id": "20260815-160406-dpu",
       "file": "photos/20260815-160406-dpu.jpg",
