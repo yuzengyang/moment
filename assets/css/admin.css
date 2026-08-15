@@ -39,6 +39,10 @@
 .badge.tag-opt { user-select: none; }
 .badge.tag-opt.active { font-weight: 600; color: var(--ink); }
 .upload-list { margin-top: 20px; display: flex; flex-direction: column; gap: 14px; }
+.progress-wrap { margin-top: 16px; }
+.progress-bar { height: 10px; border-radius: 99px; background: var(--cream-deep); overflow: hidden; border: 1px solid var(--line); }
+.progress-fill { height: 100%; width: 0; border-radius: 99px; background: linear-gradient(90deg, var(--peach-soft), var(--peach)); transition: width .3s ease; }
+.progress-text { margin-top: 6px; font-size: 0.8rem; color: var(--ink-soft); text-align: center; }
 .upload-item {
   display: grid; grid-template-columns: 92px 1fr; gap: 16px;
   border: 1px solid var(--line); border-radius: 16px; padding: 12px; background: #FFFDFB;
