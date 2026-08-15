@@ -96,6 +96,23 @@
     </div>
   </div>
 
+  <!-- 留言板 -->
+  <section class="guestbook" id="guestbook">
+    <div class="gb-head">
+      <h2>留言板</h2>
+      <p>来都来了，留句话吧</p>
+    </div>
+    <form class="gb-form" id="gbForm">
+      <div class="gb-row">
+        <input class="input" id="gbName" maxlength="30" placeholder="你的名字" autocomplete="off">
+        <button class="btn btn-primary" type="submit">留下足迹</button>
+      </div>
+      <textarea class="input" id="gbContent" maxlength="300" placeholder="想说的话…"></textarea>
+      <div class="gb-feedback" id="gbFeedback"></div>
+    </form>
+    <div class="gb-list" id="gbList"></div>
+  </section>
+
   <footer class="footer">
     <div class="updated" id="updatedInfo"></div>
     <div class="copy">温琳舒 <span class="heart">♥</span> 于增洋 · Our Moments</div>
