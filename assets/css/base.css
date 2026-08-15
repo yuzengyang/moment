@@ -111,6 +111,12 @@ input, textarea, select { font-family: inherit; font-size: 1rem; color: var(--in
 .badge img { width: 24px; height: 24px; border-radius: 50%; background: var(--cream-deep); }
 .badge .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
 
+/* ---------- 分类标签 ---------- */
+.cat-badge {
+  display: inline-block; margin-left: 6px; padding: 1px 9px; border-radius: 999px;
+  font-size: 0.7rem; font-weight: 500; background: #FDEAE3; color: #C96F57; vertical-align: middle;
+}
+
 /* ---------- 留言头像 ---------- */
 .gb-avatar {
   flex: none; width: 42px; height: 42px; border-radius: 50%;
