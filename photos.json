@@ -1,8 +1,30 @@
 {
   "version": 1,
-  "updated": "2026-08-15T08:01:54.473Z",
+  "updated": "2026-08-15T08:04:15.641Z",
   "updatedBy": "yuzengyang",
   "photos": [
+    {
+      "id": "20260815-160406-dpu",
+      "file": "photos/20260815-160406-dpu.jpg",
+      "location": "烟台",
+      "date": "2025-07-10",
+      "caption": "",
+      "author": "yuzengyang",
+      "tags": [],
+      "visibility": "public",
+      "created": "2026-08-15T08:04:06.487Z"
+    },
+    {
+      "id": "20260815-160406-p8o",
+      "file": "photos/20260815-160406-p8o.jpg",
+      "location": "烟台",
+      "date": "2025-07-10",
+      "caption": "",
+      "author": "yuzengyang",
+      "tags": [],
+      "visibility": "public",
+      "created": "2026-08-15T08:04:10.312Z"
+    },
     {
       "id": "20260815-160148-97n",
       "file": "photos/20260815-160148-97n.jpg",
