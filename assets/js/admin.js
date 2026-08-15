@@ -145,7 +145,7 @@
             '<div class="field" style="margin:0"><label>地点</label><input class="input up-loc" placeholder="例如：成都 · 玉林路" value=""></div>' +
             '<div class="field" style="margin:0"><label>日期</label><input class="input up-date" type="date" value="' + iso + '"></div>' +
           '</div>' +
-          '<div class="field up-cap" style="margin:0"><label>想说的话</label><textarea class="input textarea up-cap" placeholder="这家店的面很香，下次还要一起来。"></textarea></div>' +
+          '<div class="field" style="margin:0"><label>想说的话</label><textarea class="input textarea up-cap" placeholder="这家店的面很香，下次还要一起来。"></textarea></div>' +
           '<div class="field" style="margin:0">' +
             '<label>谁一起出镜了？</label>' +
             '<div class="badge-row up-tags">' +
@@ -182,7 +182,7 @@
         file: file,
         location: item.querySelector('.up-loc').value.trim(),
         date: item.querySelector('.up-date').value,
-        caption: item.querySelector('.up-cap').value.trim(),
+        caption: item.querySelector('textarea.up-cap').value.trim(),
         tags: tags,
         author: currentUser
       });
@@ -191,12 +191,12 @@
   }
 
   async function doUpload() {
-    const entries = collectEntries();
-    if (!entries.length) { toast('先选几张照片吧', 'err'); return; }
-
     els.uploadBtn.disabled = true;
-    els.uploadBtn.textContent = '正在上传…';
+    els.uploadBtn.textContent = '正在准备…';
     try {
+      const entries = collectEntries();
+      if (!entries.length) { toast('先选几张照片吧', 'err'); return; }
+
       // 逐张压缩
       const prepared = [];
       for (let i = 0; i < entries.length; i++) {
