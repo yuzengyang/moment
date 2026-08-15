@@ -97,14 +97,20 @@ function ghHeaders(auth = true) {
 /* 读取仓库文件；不存在返回 null。auth=false 用于展览页匿名实时读取 */
 async function ghGetFile(path, auth = true) {
   const url = GH_API + '/repos/' + SITE.repoOwner + '/' + SITE.repoName + '/contents/' + path;
-  const res = await fetch(url, { headers: ghHeaders(auth) });
-  if (res.status === 404) return null;
-  if (!res.ok) throw new Error('GitHub 读取失败 (' + res.status + ')');
-  const data = await res.json();
-  return {
-    content: decodeBase64Utf8(data.content),
-    sha: data.sha
-  };
+  const ctrl = new AbortController();
+  const timer = setTimeout(function () { ctrl.abort(); }, 15000);
+  try {
+    const res = await fetch(url, { headers: ghHeaders(auth), signal: ctrl.signal });
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error('GitHub 读取失败 (' + res.status + ')');
+    const data = await res.json();
+    return {
+      content: decodeBase64Utf8(data.content),
+      sha: data.sha
+    };
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 /* 写入/更新仓库文件（自动携带最新 sha） */
@@ -115,7 +121,16 @@ async function ghPutFile(path, content, message) {
     const cur = await ghGetFile(path);
     if (cur) body.sha = cur.sha;
   } catch (e) { /* 文件可能不存在 */ }
-  const res = await fetch(url, { method: 'PUT', headers: ghHeaders(), body: JSON.stringify(body) });
+  const ctrl = new AbortController();
+  const timer = setTimeout(function () { ctrl.abort(); }, 20000);
+  let res;
+  try {
+    res = await fetch(url, { method: 'PUT', headers: ghHeaders(), body: JSON.stringify(body), signal: ctrl.signal });
+  } catch (e) {
+    clearTimeout(timer);
+    throw new Error(e.name === 'AbortError' ? 'GitHub 连接超时，请检查网络后重试' : 'GitHub 连接失败：' + e.message);
+  }
+  clearTimeout(timer);
   if (!res.ok) {
     const detail = await res.json().catch(function () { return null; });
     throw new Error('GitHub 写入失败 (' + res.status + ')' + (detail && detail.message ? '：' + detail.message : ''));
