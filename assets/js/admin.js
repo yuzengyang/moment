@@ -336,7 +336,7 @@
       const rawUrl = 'https://raw.githubusercontent.com/' + SITE.repoOwner + '/' + SITE.repoName + '/main/' + p.file;
 
       item.innerHTML =
-        '<div class="m-thumb"><img src="' + rawUrl + '" alt="" onerror="this.style.display=\'none\'"></div>' +
+        '<div class="m-thumb"><img src="' + rawUrl + '" alt=""></div>' +
         '<div class="m-info">' +
           '<div class="m-loc">' + esc(p.location || '地点待补充') + '</div>' +
           '<div class="m-cap">' + esc(p.caption || '没有留下文字') + '</div>' +
@@ -360,6 +360,14 @@
       });
 
       els.manageList.appendChild(item);
+      const mImg = item.querySelector('.m-thumb img');
+      mImg.addEventListener('error', function () {
+        if (mImg.src.indexOf('raw.githubusercontent.com') > -1) {
+          mImg.src = mImg.src.replace('raw.githubusercontent.com/', 'cdn.jsdelivr.net/gh/').replace('/main/', '@main/');
+        } else {
+          mImg.style.display = 'none';
+        }
+      });
       // 本地演示模式下若 IndexedDB 有该照片，用本地图覆盖
       getBlobDB(p.id).then(function (blob) {
         if (blob) item.querySelector('.m-thumb img').src = URL.createObjectURL(blob);
