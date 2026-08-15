@@ -1,6 +1,40 @@
 {
   "version": 1,
-  "updated": "2026-08-15T07:36:40.844Z",
+  "updated": "2026-08-15T07:48:11.634Z",
   "updatedBy": "yuzengyang",
-  "photos": []
+  "photos": [
+    {
+      "id": "20260815-154758-gaj",
+      "file": "photos/20260815-154758-gaj.jpg",
+      "location": "西安",
+      "date": "2025-04-05",
+      "caption": "",
+      "author": "yuzengyang",
+      "tags": [],
+      "visibility": "public",
+      "created": "2026-08-15T07:47:58.042Z"
+    },
+    {
+      "id": "20260815-154758-325",
+      "file": "photos/20260815-154758-325.jpg",
+      "location": "",
+      "date": "2025-04-29",
+      "caption": "",
+      "author": "yuzengyang",
+      "tags": [],
+      "visibility": "public",
+      "created": "2026-08-15T07:48:02.589Z"
+    },
+    {
+      "id": "20260815-154758-ivh",
+      "file": "photos/20260815-154758-ivh.jpg",
+      "location": "",
+      "date": "2025-04-29",
+      "caption": "",
+      "author": "yuzengyang",
+      "tags": [],
+      "visibility": "public",
+      "created": "2026-08-15T07:48:07.316Z"
+    }
+  ]
 }
