@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-08-15T16:09:49.680Z",
+  "updated": "2026-08-15T16:10:49.194Z",
   "updatedBy": "yuzengyang",
   "photos": [
     {
@@ -84,7 +84,8 @@
       "author": "yuzengyang",
       "tags": [],
       "visibility": "public",
-      "created": "2026-08-15T08:10:41.485Z"
+      "created": "2026-08-15T08:10:41.485Z",
+      "category": "scenery"
     },
     {
       "id": "20260815-160857-ifm",
