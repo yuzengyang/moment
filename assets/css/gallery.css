@@ -97,6 +97,22 @@
 .photo-card .meta .date { font-size: 0.78rem; color: var(--ink-soft); }
 .photo-card .meta .who { font-size: 0.78rem; color: var(--peach); font-weight: 500; }
 
+/* 分类筛选 */
+.cat-filter {
+  max-width: 1180px; margin: 4px auto 0; padding: 0 24px;
+  display: flex; gap: 10px;
+}
+.cat-chip {
+  padding: 7px 22px; border-radius: 999px; border: 1.5px solid var(--line);
+  background: #fff; font-size: 0.9rem; color: var(--ink-soft); cursor: pointer;
+  transition: all .25s ease;
+}
+.cat-chip:hover { border-color: var(--peach-soft); color: var(--peach); }
+.cat-chip.active {
+  background: linear-gradient(135deg, #FFB6A3, #F2767E); border-color: transparent;
+  color: #fff; box-shadow: 0 6px 16px rgba(242, 118, 126, 0.3);
+}
+
 .more-wrap { text-align: center; margin: 30px 0 12px; }
 .more-wrap .btn {
   min-width: 140px; padding: 11px 30px;
