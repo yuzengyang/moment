@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-08-15T16:08:10.479Z",
+  "updated": "2026-08-15T16:09:02.141Z",
   "updatedBy": "yuzengyang",
   "photos": [
     {
@@ -48,7 +48,8 @@
       "author": "yuzengyang",
       "tags": [],
       "visibility": "public",
-      "created": "2026-08-15T08:12:28.581Z"
+      "created": "2026-08-15T08:12:28.581Z",
+      "category": "scenery"
     },
     {
       "id": "20260815-161137-tum",
