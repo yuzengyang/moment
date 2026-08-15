@@ -21,6 +21,7 @@
 }
 .mode-bar .tag.github { background: #E7F1EA; color: #3D7A52; }
 .mode-bar .tag.local { background: #FFF0E0; color: #B0742B; }
+.mode-bar .tag.pending { background: #FFF3D6; color: #A87B1E; }
 
 /* 上传区 */
 .dropzone {
