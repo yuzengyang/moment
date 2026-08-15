@@ -68,6 +68,10 @@
 .manage-item .m-info .m-loc { font-size: 0.95rem; font-weight: 600; }
 .manage-item .m-info .m-cap { font-size: 0.83rem; color: var(--ink-soft); margin-top: 2px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
 .manage-item .m-info .m-date { font-size: 0.76rem; color: var(--ink-soft); opacity: 0.8; margin-top: 3px; }
+.vis-tag {
+  display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 999px;
+  font-size: 0.7rem; font-weight: 500; background: #FFF0E0; color: #B0742B; vertical-align: middle;
+}
 .manage-item .m-ops { display: flex; gap: 8px; }
 
 /* 设置面板 */
