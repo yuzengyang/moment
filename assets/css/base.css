@@ -53,9 +53,12 @@ input, textarea, select { font-family: inherit; font-size: 1rem; color: var(--in
   border-radius: 999px;
   box-shadow: 0 6px 24px rgba(190, 140, 110, 0.10);
 }
-.brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-serif); font-size: 1.06rem; letter-spacing: 0.02em; }
-.brand svg { width: 26px; height: 26px; }
-.brand .brand-sub { color: var(--ink-soft); font-family: var(--font-sans); font-size: 0.78rem; letter-spacing: 0.06em; margin-top: 1px; }
+.brand { display: flex; align-items: center; gap: 12px; font-family: "KaiTi", "STKaiti", "Kaiti SC", "楷体", "KaiTi_GB2312", serif; font-size: 1.1rem; letter-spacing: 0.14em; }
+.brand svg { width: 26px; height: 26px; flex: none; }
+.brand .brand-sub {
+  color: var(--peach); font-family: "Palatino Linotype", "Book Antiqua", "Palatino", Georgia, serif;
+  font-style: italic; font-size: 0.82rem; letter-spacing: 0.16em; margin-top: 3px; font-weight: 500;
+}
 
 .nav-links { display: flex; align-items: center; gap: 6px; }
 .nav-link {
