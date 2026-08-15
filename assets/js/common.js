@@ -13,13 +13,19 @@ const COMPANIONS = [
 ];
 
 const CATEGORIES = [
-  { key: 'scenery', name: '美景' },
-  { key: 'food', name: '美食' }
+  { key: 'scenery', name: '美景', color: '#7FA36B' },
+  { key: 'food', name: '美食', color: '#E06A5E' },
+  { key: 'us', name: '我们', color: '#5B8DB8' }
 ];
 
 function categoryName(key) {
   const c = CATEGORIES.find(function (x) { return x.key === key; });
   return c ? c.name : '';
+}
+
+function categoryColor(key) {
+  const c = CATEGORIES.find(function (x) { return x.key === key; });
+  return c ? c.color : '';
 }
 
 const SITE = {
