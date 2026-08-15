@@ -171,3 +171,49 @@
 }
 .back-top.show { opacity: 1; transform: none; pointer-events: auto; }
 .back-top:hover { background: #FFF4F2; }
+
+/* ---------- 留言板 ---------- */
+.guestbook {
+  max-width: 720px; margin: 30px auto 0; padding: 0 24px;
+}
+.gb-head { text-align: center; margin-bottom: 22px; }
+.gb-head h2 {
+  font-family: "KaiTi", "STKaiti", "楷体", serif;
+  font-size: 1.5rem; font-weight: 500; letter-spacing: 0.12em; color: var(--ink);
+}
+.gb-head p { color: var(--ink-soft); font-size: 0.88rem; margin-top: 6px; letter-spacing: 0.06em; }
+.gb-form {
+  background: #fff; border: 1px solid rgba(240, 223, 210, 0.8); border-radius: 20px;
+  padding: 18px 20px; box-shadow: var(--shadow);
+}
+.gb-row { display: flex; gap: 10px; margin-bottom: 12px; }
+.gb-row .input { flex: 1; }
+.gb-row .btn { flex: none; padding: 10px 24px; }
+.gb-form textarea { min-height: 68px; resize: vertical; }
+.gb-feedback { display: none; margin-top: 10px; font-size: 0.82rem; padding: 8px 12px; border-radius: 10px; }
+.gb-feedback.ok { display: block; background: #EEF6EE; color: #3D7A52; }
+.gb-feedback.err { display: block; background: #FDECEA; color: #C9554F; }
+
+.gb-list { margin-top: 20px; display: flex; flex-direction: column; gap: 12px; }
+.gb-empty { text-align: center; color: var(--ink-soft); font-size: 0.88rem; padding: 26px 0; }
+.gb-item {
+  display: flex; gap: 14px; align-items: flex-start;
+  background: #fff; border: 1px solid rgba(240, 223, 210, 0.8); border-radius: 16px;
+  padding: 16px 18px; box-shadow: var(--shadow);
+}
+.gb-avatar {
+  flex: none; width: 42px; height: 42px; border-radius: 50%;
+  background: linear-gradient(135deg, #FFE0D8, #FFB6A3);
+  display: flex; align-items: center; justify-content: center;
+  font-family: "KaiTi", "楷体", serif; color: #fff; font-size: 1.15rem;
+}
+.gb-body { flex: 1; min-width: 0; }
+.gb-meta { display: flex; align-items: baseline; gap: 10px; }
+.gb-name { font-weight: 600; font-size: 0.95rem; color: var(--ink); }
+.gb-time { font-size: 0.74rem; color: var(--ink-soft); opacity: 0.85; }
+.gb-content { margin-top: 6px; font-size: 0.93rem; color: var(--ink); line-height: 1.75; white-space: pre-wrap; word-break: break-word; }
+
+@media (max-width: 560px) {
+  .gb-row { flex-direction: column; }
+  .gb-row .btn { width: 100%; }
+}
