@@ -213,5 +213,18 @@
     });
   }
 
+  /* 展览页自动同步：每 30 秒检查 GitHub 上的最新元数据，有更新自动重渲染 */
+  let lastUpdated = null;
+  setInterval(async function () {
+    if (photos._source === 'local') return;
+    const meta = await loadGithubMetaAnon();
+    if (!meta || !meta.updated) return;
+    if (lastUpdated === null) { lastUpdated = meta.updated; return; }
+    if (meta.updated !== lastUpdated) {
+      lastUpdated = meta.updated;
+      reload();
+    }
+  }, 30000);
+
   init();
 })();
