@@ -104,6 +104,14 @@ input, textarea, select { font-family: inherit; font-size: 1rem; color: var(--in
 .badge img { width: 24px; height: 24px; border-radius: 50%; background: var(--cream-deep); }
 .badge .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
 
+/* ---------- 留言头像 ---------- */
+.gb-avatar {
+  flex: none; width: 42px; height: 42px; border-radius: 50%;
+  background: linear-gradient(135deg, #FFE0D8, #FFB6A3);
+  display: flex; align-items: center; justify-content: center;
+  font-family: "KaiTi", "楷体", serif; color: #fff; font-size: 1.15rem;
+}
+
 /* ---------- 页脚 ---------- */
 .footer {
   text-align: center; padding: 46px 20px 34px; color: var(--ink-soft); font-size: 0.85rem;
