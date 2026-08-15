@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登录 · 我们的时光簿</title>
+  <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/login.css">
+</head>
+<body class="page-login">
+
+  <div class="login-card">
+    <div class="login-head">
+      <img class="seal-photo" src="photos/20260814-001.jpg" alt="我们的照片">
+      <h1>回到时光簿</h1>
+      <p>温琳舒 ♥ 于增洋 · 只有我们知道的地方</p>
+    </div>
+
+    <div class="account-pick">
+      <button type="button" class="account-btn" data-user="wenlinshu">
+        <div class="ab-avatar">温</div>
+        <div class="ab-name">温琳舒</div>
+        <div class="ab-user">wenlinshu</div>
+      </button>
+      <button type="button" class="account-btn" data-user="yuzengyang">
+        <div class="ab-avatar">于</div>
+        <div class="ab-name">于增洋</div>
+        <div class="ab-user">yuzengyang</div>
+      </button>
+    </div>
+
+    <form id="loginForm">
+      <div class="field">
+        <label for="user">账号</label>
+        <input class="input" id="user" name="user" autocomplete="username" placeholder="wenlinshu / yuzengyang">
+      </div>
+      <div class="field">
+        <label for="pass">密码</label>
+        <input class="input" id="pass" name="pass" type="password" autocomplete="current-password" placeholder="两个人的小秘密">
+      </div>
+      <div class="login-err" id="loginErr"></div>
+      <div class="login-actions">
+        <button class="btn btn-primary" type="submit" style="width:100%">登录</button>
+      </div>
+    </form>
+
+    <div class="login-back"><a href="index.html">← 回到展览页</a></div>
+    <div class="hint-tip">账号密码只属于你们两个人，别告诉别人哦。</div>
+  </div>
+
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/login.js"></script>
+</body>
+</html>
