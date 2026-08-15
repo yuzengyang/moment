@@ -375,27 +375,47 @@
       setToken(t);
       els.tokenSave.disabled = true;
       els.tokenSave.textContent = '验证中…';
-      try {
-        const res = await fetch('https://api.github.com/user', { headers: { Authorization: 'Bearer ' + t } });
-        if (res.ok) {
-          const me = await res.json();
-          toast('Token 有效：' + (me.login || 'OK'), 'ok');
-          setMode('github');
-          refreshModeBar();
-          refreshManageList();
-        } else {
-          toast('Token 无效（' + res.status + '），请检查权限', 'err');
+      const login = await verifyToken(t);
+      if (login) {
+        toast('Token 有效：' + login, 'ok');
+        setMode('github');
+        refreshModeBar();
+        refreshManageList();
+      }
+      els.tokenSave.disabled = false;
+      els.tokenSave.textContent = '保存并验证';
+    });
+
+    /* 验证 token：10 秒超时，失败自动重试一次，并给出具体原因 */
+    async function verifyToken(t) {
+      for (let attempt = 1; attempt <= 2; attempt++) {
+        const ctrl = new AbortController();
+        const timer = setTimeout(function () { ctrl.abort(); }, 10000);
+        try {
+          const res = await fetch('https://api.github.com/user', {
+            headers: { Authorization: 'Bearer ' + t },
+            signal: ctrl.signal
+          });
+          clearTimeout(timer);
+          if (res.ok) {
+            const me = await res.json();
+            return me.login || 'OK';
+          }
+          toast('Token 无效（' + res.status + '），请检查权限设置', 'err');
           lsDel(TOKEN_KEY);
           refreshModeBar();
+          return null;
+        } catch (e) {
+          clearTimeout(timer);
+          if (attempt === 1) { continue; }
+          const reason = e.name === 'AbortError' ? '连接超时' : (e.message || '网络异常');
+          toast('无法连接 GitHub：' + reason + '。请确认浏览器能打开 api.github.com，并检查代理/拦截插件', 'err');
+          refreshModeBar();
+          return null;
         }
-      } catch (e) {
-        toast('无法连接 GitHub，请检查网络', 'err');
-        refreshModeBar();
-      } finally {
-        els.tokenSave.disabled = false;
-        els.tokenSave.textContent = '保存并验证';
       }
-    });
+      return null;
+    }
 
     els.tokenClear.addEventListener('click', function () {
       if (!confirm('清除已保存的 Token？')) return;
