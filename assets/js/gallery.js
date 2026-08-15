@@ -161,6 +161,15 @@
       .replace(/"/g, '&quot;');
   }
 
+  /* 页脚更新日期：只显示 YYYY-MM-DD */
+  function fmtDateOnly(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    if (isNaN(d)) return iso;
+    const p = function (n) { return String(n).padStart(2, '0'); };
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+  }
+
   /* 图片加载失败逐级兜底：raw（实时）→ jsDelivr CDN → Pages 静态 → 占位图 */
   function fallbackImg(img) {
     const cur = img.src;
@@ -254,8 +263,7 @@
     if (!el) return;
     loadUpdatedInfo().then(function (info) {
       if (!info.updated) { el.textContent = ''; return; }
-      const who = info.updatedBy ? ' · ' + authorName(info.updatedBy) + ' 更新' : '';
-      el.textContent = '最后更新：' + fmtDateTime(info.updated) + who;
+      el.textContent = '最后更新：' + fmtDateOnly(info.updated);
     });
   }
 
