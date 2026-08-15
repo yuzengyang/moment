@@ -42,6 +42,11 @@
     toastTimer = setTimeout(function () { els.toast.className = 'toast'; }, 5000);
   }
 
+  /* 操作成功后通知其他标签页（展览页）立即刷新 */
+  function notifySync() {
+    lsSet('om_sync', String(Date.now()));
+  }
+
   function showProgress(pct, text) {
     if (!els.progressWrap) return;
     els.progressWrap.style.display = 'block';
@@ -76,7 +81,11 @@
     const wantGithub = lsGet(MODE_KEY) === 'github';
     const hasToken = !!lsGet('om_token');
 
-    if (wantGithub && hasToken) {
+    if (!hasToken && wantGithub) {
+      els.modeTag.textContent = 'GitHub 未连接';
+      els.modeTag.className = 'tag pending';
+      els.modeText.textContent = '⚠️ 未检测到 Token（清缓存会清除它）。当前上传/删除只影响本机，不会同步到线上。请在下方粘贴 Token 并保存验证。';
+    } else if (wantGithub && hasToken) {
       els.modeTag.textContent = 'GitHub 实时';
       els.modeTag.className = 'tag github';
       els.modeText.textContent = '照片会写入 GitHub 仓库，任何设备打开展览页都能看到最新内容。';
@@ -307,6 +316,7 @@
         toast('上传成功 ' + n + ' 张，展览页已更新', 'ok');
       }
       refreshManageList();
+      notifySync();
     } catch (err) {
       toast('上传失败：' + err.message, 'err');
     } finally {
@@ -355,6 +365,7 @@
         deletePhoto(p.id, currentUser).then(function () {
           toast('已删除，展览页将自动更新', 'ok');
           refreshManageList();
+          notifySync();
         }).catch(function (err) {
           toast('删除失败：' + err.message, 'err');
           btn.disabled = false;
@@ -433,6 +444,7 @@
           editingId = null;
           toast('已保存', 'ok');
           refreshManageList();
+          notifySync();
         }).catch(function (err) { toast('保存失败：' + err.message, 'err'); });
       });
     });
