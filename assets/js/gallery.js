@@ -79,12 +79,12 @@
   function render() {
     grid.innerHTML = '';
     emptyEl.style.display = photos.length ? 'none' : 'block';
-    countEl.innerHTML = '<b>' + filtered.length + '</b> 段时光';
     syncEl.style.display = 'none';
 
     const filtered = filterCategory === 'all'
       ? photos
       : photos.filter(function (p) { return p.category === filterCategory; });
+    countEl.innerHTML = '<b>' + filtered.length + '</b> 段时光';
     const visible = expanded ? filtered : filtered.slice(0, SHOW_INITIAL);
     currentList = visible;
     visible.forEach(function (p, idx) { buildCard(p, idx); });
