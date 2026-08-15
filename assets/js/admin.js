@@ -245,25 +245,10 @@
             '<div class="field" style="margin:0"><label>日期</label><input class="input up-date" type="date" value="' + iso + '"></div>' +
           '</div>' +
           '<div class="field" style="margin:0"><label>想说的话</label><textarea class="input textarea up-cap" placeholder="这家店的面很香，下次还要一起来。"></textarea></div>' +
-          '<div class="field" style="margin:0">' +
-            '<label>谁一起出镜了？</label>' +
-            '<div class="badge-row up-tags">' +
-              COMPANIONS.map(function (c) {
-                return '<span class="badge tag-opt" data-key="' + c.key + '" style="cursor:pointer"><img src="' + c.file + '" alt="">' + c.name + '</span>';
-              }).join('') +
-            '</div>' +
-          '</div>' +
           '<div style="text-align:right"><button class="btn btn-ghost btn-sm up-remove" type="button">移除</button></div>' +
         '</div>';
 
       el.querySelector('.up-remove').addEventListener('click', function () { removeFileAt(i); });
-      el.querySelectorAll('.tag-opt').forEach(function (badge) {
-        badge.addEventListener('click', function () {
-          const on = badge.classList.toggle('active');
-          const c = companionByKey(badge.dataset.key);
-          badge.style.borderColor = on && c ? c.color : '';
-        });
-      });
       els.uploadList.appendChild(el);
     });
   }
