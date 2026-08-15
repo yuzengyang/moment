@@ -7,7 +7,8 @@
   let currentIndex = -1;
   const SHOW_INITIAL = 12;   // 主页默认展示最新 12 张
   let expanded = false;      // 是否展开全部
-  let filterCategory = 'all'; // 分类筛选：all | scenery | food
+  let filterCategory = 'all'; // 分类筛选：all | scenery | food | us
+  let currentList = [];        // 当前实际展示的照片列表（含分类筛选）
 
   const grid = document.getElementById('grid');
   const countEl = document.getElementById('photoCount');
@@ -78,13 +79,14 @@
   function render() {
     grid.innerHTML = '';
     emptyEl.style.display = photos.length ? 'none' : 'block';
-    countEl.innerHTML = '<b>' + photos.length + '</b> 段时光';
+    countEl.innerHTML = '<b>' + filtered.length + '</b> 段时光';
     syncEl.style.display = 'none';
 
     const filtered = filterCategory === 'all'
       ? photos
       : photos.filter(function (p) { return p.category === filterCategory; });
     const visible = expanded ? filtered : filtered.slice(0, SHOW_INITIAL);
+    currentList = visible;
     visible.forEach(function (p, idx) { buildCard(p, idx); });
     lazyLoad();
 
@@ -141,17 +143,17 @@
   }
 
   function step(dir) {
-    if (!photos.length) return;
-    currentIndex = (currentIndex + dir + photos.length) % photos.length;
+    if (!currentList.length) return;
+    currentIndex = (currentIndex + dir + currentList.length) % currentList.length;
     fillModal();
   }
 
   function fillModal() {
-    const p = photos[currentIndex];
+    const p = currentList[currentIndex];
     if (!p) return;
     modalImg.src = p.url || '';
     modalImg.alt = p.location || '照片';
-    modalCount.textContent = (currentIndex + 1) + ' / ' + photos.length;
+    modalCount.textContent = (currentIndex + 1) + ' / ' + currentList.length;
     modalLoc.textContent = p.location || '地点待补充';
     modalDate.textContent = (p.date ? fmtDate(p.date) + ' · ' : '') + '上传于 ' + fmtDateTime(p.created);
     modalCap.textContent = p.caption || '这张照片还没有写下故事。';
@@ -349,7 +351,7 @@
     });
   }
 
-  /* 展览页自动同步：每 30 秒检查 GitHub 上的最新元数据，有更新自动重渲染 */
+  /* 展览页自动同步：每 10 秒检查 GitHub 上的最新元数据，有更新自动重渲染 */
   let lastUpdated = null;
   setInterval(async function () {
     if (photos._source === 'local') return;
