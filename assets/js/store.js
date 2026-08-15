@@ -125,9 +125,10 @@ async function ghGetFile(path, auth = true) {
 }
 
 /* 写入/更新仓库文件（自动携带最新 sha） */
-async function ghPutFile(path, content, message) {
+async function ghPutFile(path, content, message, alreadyBase64) {
   const url = GH_API + '/repos/' + SITE.repoOwner + '/' + SITE.repoName + '/contents/' + path;
-  const body = { message: message, content: btoaUnicode(content), branch: 'main' };
+  // alreadyBase64=true：content 已是文件的 base64（图片），直接使用，避免双重编码
+  const body = { message: message, content: alreadyBase64 ? content : btoaUnicode(content), branch: 'main' };
   try {
     const cur = await ghGetFile(path);
     if (cur) body.sha = cur.sha;
@@ -314,7 +315,7 @@ async function uploadPhotos(entries, onProgress) {
       try {
         const exists = await ghGetFile(meta.file);
         if (!exists) {
-          await ghPutFile(meta.file, stripDataPrefix(e.dataUrl), '上传照片 ' + e.id);
+          await ghPutFile(meta.file, stripDataPrefix(e.dataUrl), '上传照片 ' + e.id, true);
         }
         uploadedMetas.push(meta);
       } catch (err) {
