@@ -98,7 +98,7 @@ function ghHeaders(auth = true) {
 async function ghGetFile(path, auth = true) {
   const url = GH_API + '/repos/' + SITE.repoOwner + '/' + SITE.repoName + '/contents/' + path;
   const ctrl = new AbortController();
-  const timer = setTimeout(function () { ctrl.abort(); }, 15000);
+  const timer = setTimeout(function () { ctrl.abort(); }, 20000);
   try {
     const res = await fetch(url, { headers: ghHeaders(auth), signal: ctrl.signal });
     if (res.status === 404) return null;
@@ -122,7 +122,7 @@ async function ghPutFile(path, content, message) {
     if (cur) body.sha = cur.sha;
   } catch (e) { /* 文件可能不存在 */ }
   const ctrl = new AbortController();
-  const timer = setTimeout(function () { ctrl.abort(); }, 20000);
+  const timer = setTimeout(function () { ctrl.abort(); }, 40000);
   let res;
   try {
     res = await fetch(url, { method: 'PUT', headers: ghHeaders(), body: JSON.stringify(body), signal: ctrl.signal });
@@ -247,20 +247,21 @@ async function loadPhotos() {
 
 /* ---------- 上传 ---------- */
 
-/* entries: [{ dataUrl, location, date, caption, tags, author }] */
-async function uploadPhotos(entries) {
-  if (!entries || !entries.length) return 0;
+/* entries: [{ dataUrl, location, date, caption, tags, author }]
+ * onProgress(done, total)：每张处理完成时回调
+ * 返回：{ uploaded, failed: [{id, err}] }
+ */
+async function uploadPhotos(entries, onProgress) {
+  if (!entries || !entries.length) return { uploaded: 0, failed: [] };
 
   if (detectMode() === 'github') {
-    // 1) 逐张上传图片
+    const uploadedMetas = [];
+    const failed = [];
+
+    // 1) 逐张上传图片（已存在则跳过，支持失败重试）
     for (let i = 0; i < entries.length; i++) {
       const e = entries[i];
-      await ghPutFile('photos/' + e.id + '.jpg', stripDataPrefix(e.dataUrl), '上传照片 ' + e.id);
-    }
-    // 2) 合并元数据并写回 photos.json
-    const existing = await loadPhotos();
-    const metas = entries.map(function (e) {
-      return {
+      const meta = {
         id: e.id,
         file: 'photos/' + e.id + '.jpg',
         location: e.location || '',
@@ -270,15 +271,32 @@ async function uploadPhotos(entries) {
         tags: e.tags || [],
         created: new Date().toISOString()
       };
-    });
-    const updated = {
-      version: 1,
-      updated: new Date().toISOString(),
-      updatedBy: (entries[0] && entries[0].author) || '',
-      photos: metas.concat(existing)
-    };
-    await ghPutFile('photos.json', JSON.stringify(updated, null, 2), '更新照片信息（+' + metas.length + '）');
-    return metas.length;
+      try {
+        const exists = await ghGetFile(meta.file);
+        if (!exists) {
+          await ghPutFile(meta.file, stripDataPrefix(e.dataUrl), '上传照片 ' + e.id);
+        }
+        uploadedMetas.push(meta);
+      } catch (err) {
+        failed.push({ id: e.id, err: err.message });
+      }
+      if (onProgress) onProgress(i + 1, entries.length);
+    }
+
+    // 2) 合并元数据写回 photos.json（已成功的都写入，并去重）
+    if (uploadedMetas.length) {
+      const existing = await loadPhotos();
+      const ids = uploadedMetas.map(function (m) { return m.id; });
+      const rest = existing.filter(function (p) { return ids.indexOf(p.id) === -1; });
+      const updated = {
+        version: 1,
+        updated: new Date().toISOString(),
+        updatedBy: (entries[0] && entries[0].author) || '',
+        photos: uploadedMetas.concat(rest)
+      };
+      await ghPutFile('photos.json', JSON.stringify(updated, null, 2), '更新照片信息（+' + uploadedMetas.length + '）');
+    }
+    return { uploaded: uploadedMetas.length, failed: failed };
   }
 
   // 本地模式
@@ -297,9 +315,10 @@ async function uploadPhotos(entries) {
       tags: e.tags || [],
       created: new Date().toISOString()
     });
+    if (onProgress) onProgress(i + 1, entries.length);
   }
   saveLocalMeta(newMetas.concat(existing), (entries[0] && entries[0].author) || '');
-  return newMetas.length;
+  return { uploaded: newMetas.length, failed: [] };
 }
 
 /* 更新单张照片元数据 */
