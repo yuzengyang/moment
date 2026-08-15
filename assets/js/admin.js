@@ -350,7 +350,7 @@
       item.innerHTML =
         '<div class="m-thumb"><img src="' + rawUrl + '" alt=""></div>' +
         '<div class="m-info">' +
-          '<div class="m-loc">' + esc(p.location || '地点待补充') + '</div>' +
+          '<div class="m-loc">' + esc(p.location || '地点待补充') + (p.visibility === 'private' ? ' <span class="vis-tag">仅我可见</span>' : '') + '</div>' +
           '<div class="m-cap">' + esc(p.caption || '没有留下文字') + '</div>' +
           '<div class="m-date">' + esc(fmtDate(p.date || p.created)) + ' · 上传于 ' + esc(fmtDateTime(p.created)) + '</div>' +
         '</div>' +
@@ -440,6 +440,12 @@
           '<div class="field" style="margin:0"><label>地点</label><input class="input e-loc" value="' + esc(p.location || '') + '"></div>' +
           '<div class="field" style="margin:0"><label>日期</label><input class="input e-date" type="date" value="' + esc(p.date || '') + '"></div>' +
         '</div>' +
+        '<div class="field" style="margin:0"><label>可见性</label>' +
+          '<select class="select e-vis">' +
+            '<option value="public"' + (p.visibility === 'private' ? '' : ' selected') + '>公开（展览页展示）</option>' +
+            '<option value="private"' + (p.visibility === 'private' ? ' selected' : '') + '>仅我可见（不在展览页展示）</option>' +
+          '</select>' +
+        '</div>' +
         '<div class="field" style="margin:0"><label>想说的话</label><textarea class="input textarea e-cap">' + esc(p.caption || '') + '</textarea></div>' +
         '<div class="field" style="margin:0">' +
           '<label>伙伴</label><div class="badge-row e-tags">' +
@@ -470,7 +476,8 @@
           location: editArea.querySelector('.e-loc').value.trim(),
           date: editArea.querySelector('.e-date').value,
           caption: editArea.querySelector('.e-cap').value.trim(),
-          tags: tags
+          tags: tags,
+          visibility: editArea.querySelector('.e-vis').value
         };
         updatePhoto(id, patch, currentUser).then(function () {
           editArea.remove();
