@@ -234,7 +234,7 @@
 
       // 本地模式：监听其他标签页的上传，自动刷新
       window.addEventListener('storage', function (e) {
-        if (e.key === LOCAL_META_KEY) reload();
+        if (e.key === LOCAL_META_KEY || e.key === 'om_sync') reload();
       });
     } catch (e) {
       photos = [];
@@ -273,7 +273,7 @@
       lastUpdated = meta.updated;
       reload();
     }
-  }, 30000);
+  }, 10000);
 
   init();
 })();
