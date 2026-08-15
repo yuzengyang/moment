@@ -249,6 +249,7 @@
     }
     render();
     fillUpdatedInfo();
+    renderMessages();
   }
 
   async function reload() {
@@ -257,6 +258,67 @@
     photos._source = res.source;
     render();
     fillUpdatedInfo();
+    renderMessages();
+  }
+
+  /* ---------- 留言板 ---------- */
+
+  const gbList = document.getElementById('gbList');
+  const gbForm = document.getElementById('gbForm');
+  const gbName = document.getElementById('gbName');
+  const gbContent = document.getElementById('gbContent');
+  const gbFeedback = document.getElementById('gbFeedback');
+
+  function renderMessages() {
+    loadMessages().then(function (msgs) {
+      gbList.innerHTML = '';
+      if (!msgs || !msgs.length) {
+        gbList.innerHTML = '<p class="gb-empty">还没有留言，来抢沙发吧</p>';
+        return;
+      }
+      msgs.forEach(function (m) {
+        const item = document.createElement('div');
+        item.className = 'gb-item';
+        const avatar = (m.name || '匿').charAt(0);
+        item.innerHTML =
+          '<div class="gb-avatar">' + esc(avatar) + '</div>' +
+          '<div class="gb-body">' +
+            '<div class="gb-meta"><span class="gb-name">' + esc(m.name || '匿名') + '</span><span class="gb-time">' + esc(fmtDateOnly(m.time)) + '</span></div>' +
+            '<div class="gb-content">' + esc(m.content) + '</div>' +
+          '</div>';
+        gbList.appendChild(item);
+      });
+    });
+  }
+
+  if (gbForm) {
+    gbForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const name = gbName.value.trim();
+      const content = gbContent.value.trim();
+      if (!name || !content) {
+        gbFeedback.textContent = '请填写名字和想说的话';
+        gbFeedback.className = 'gb-feedback err';
+        return;
+      }
+      const btn = gbForm.querySelector('button');
+      btn.disabled = true;
+      btn.textContent = '发送中…';
+      addMessage(name, content).then(function (res) {
+        gbName.value = '';
+        gbContent.value = '';
+        gbFeedback.textContent = res.synced ? '留言成功，谢谢你的足迹 ♥' : '留言成功（当前设备未同步，仅本机可见）';
+        gbFeedback.className = 'gb-feedback ok';
+        renderMessages();
+        btn.disabled = false;
+        btn.textContent = '留下足迹';
+      }).catch(function (err) {
+        gbFeedback.textContent = '发送失败：' + err.message;
+        gbFeedback.className = 'gb-feedback err';
+        btn.disabled = false;
+        btn.textContent = '留下足迹';
+      });
+    });
   }
 
   function fillUpdatedInfo() {
