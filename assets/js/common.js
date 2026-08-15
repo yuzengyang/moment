@@ -12,6 +12,16 @@ const COMPANIONS = [
   { key: 'bubu',  name: '布布', color: '#8FB6CE', file: 'assets/img/avatars/bubu.svg' }
 ];
 
+const CATEGORIES = [
+  { key: 'scenery', name: '美景' },
+  { key: 'food', name: '美食' }
+];
+
+function categoryName(key) {
+  const c = CATEGORIES.find(function (x) { return x.key === key; });
+  return c ? c.name : '';
+}
+
 const SITE = {
   title: '温琳舒 ♥ 于增洋',
   subtitle: '我们的时光簿',
