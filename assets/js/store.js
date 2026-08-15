@@ -18,6 +18,9 @@ const GH_API = 'https://api.github.com';
 const GH_RAW = 'https://raw.githubusercontent.com';
 const GH_JSD = 'https://cdn.jsdelivr.net/gh';
 
+function photoPagesUrl(file) {
+  return 'https://' + SITE.repoOwner + '.github.io/' + SITE.repoName + '/' + file;
+}
 function photoRawUrl(file) {
   return GH_RAW + '/' + SITE.repoOwner + '/' + SITE.repoName + '/main/' + file;
 }
@@ -202,10 +205,11 @@ async function loadGithubPhotosAnon() {
 }
 
 async function loadGithubMetaAnon() {
-  // 渠道 1+2：raw（实时）与 jsDelivr（国内 CDN 稳），无速率限制
+  // 渠道 1-3：Pages 静态（最稳，已构建）→ jsDelivr（CDN）→ raw（实时），无速率限制
   const urls = [
-    photoRawUrl('photos.json'),
-    photoJsUrl('photos.json')
+    photoPagesUrl('photos.json'),
+    photoJsUrl('photos.json'),
+    photoRawUrl('photos.json')
   ];
   for (let i = 0; i < urls.length; i++) {
     const ctrl = new AbortController();
@@ -237,7 +241,7 @@ async function loadGalleryPhotos() {
   if (fresh && fresh.length) {
     return {
       photos: fresh.map(function (p) {
-        return Object.assign({}, p, { url: photoRawUrl(p.file) });
+        return Object.assign({}, p, { url: photoPagesUrl(p.file) });
       }),
       source: 'github-live'
     };
