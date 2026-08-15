@@ -205,12 +205,12 @@ async function loadGithubPhotosAnon() {
   return m ? (Array.isArray(m.photos) ? m.photos : null) : null;
 }
 
-async function loadGithubMetaAnon() {
-  // 渠道优先级：raw（实时，上传/删除后立即反映）→ jsDelivr（CDN）→ Pages 静态（最稳），无速率限制
+/* 通用多渠道读取 GitHub 上的 JSON（raw → jsDelivr → Pages → API） */
+async function fetchGithubJson(relPath) {
   const urls = [
-    photoRawUrl('photos.json'),
-    photoJsUrl('photos.json'),
-    photoPagesUrl('photos.json')
+    photoRawUrl(relPath),
+    photoJsUrl(relPath),
+    photoPagesUrl(relPath)
   ];
   for (let i = 0; i < urls.length; i++) {
     const ctrl = new AbortController();
@@ -219,20 +219,23 @@ async function loadGithubMetaAnon() {
       const res = await fetch(urls[i], { cache: 'no-store', signal: ctrl.signal });
       clearTimeout(timer);
       if (res.ok) {
-        const data = await res.json();
-        if (data && data.photos) return data;
+        return await res.json();
       }
     } catch (e) { clearTimeout(timer); /* 尝试下一渠道 */ }
   }
-  // 渠道 3：GitHub API（base64，匿名限流 60 次/小时，仅作兜底）
   const ctrl = new AbortController();
   const timer = setTimeout(function () { ctrl.abort(); }, 6000);
   try {
-    const f = await ghGetFile('photos.json', false);
+    const f = await ghGetFile(relPath, false);
     if (!f) return null;
     return JSON.parse(f.content);
   } catch (e) { return null; }
   finally { clearTimeout(timer); }
+}
+
+async function loadGithubMetaAnon() {
+  const data = await fetchGithubJson('photos.json');
+  return (data && data.photos) ? data : null;
 }
 
 /* 展览页统一入口：返回 { photos, source } */
@@ -421,4 +424,67 @@ async function loadUpdatedInfo() {
   }
   if (!meta) return { updated: '', updatedBy: '' };
   return { updated: meta.updated || '', updatedBy: meta.updatedBy || '' };
+}
+
+
+/* ============ 留言板 ============ */
+
+const LOCAL_MSG_KEY = 'om_messages_local';
+
+function localMessages() {
+  try { return JSON.parse(lsGet(LOCAL_MSG_KEY) || '[]'); } catch (e) { return []; }
+}
+
+/* 读取留言：GitHub 优先（多渠道），本地兜底 */
+async function loadMessages() {
+  // 有 token 用认证读取（实时）
+  if (lsGet(TOKEN_KEY)) {
+    try {
+      const f = await ghGetFile('messages.json', true);
+      if (f) {
+        const d = JSON.parse(f.content);
+        if (Array.isArray(d.messages)) return d.messages;
+      }
+    } catch (e) {}
+  }
+  const data = await fetchGithubJson('messages.json');
+  if (data && Array.isArray(data.messages)) return data.messages;
+  return localMessages();
+}
+
+/* 新增留言：有 token 写 GitHub，无 token 存本地 */
+async function addMessage(name, content) {
+  const msg = {
+    id: genId() + '-msg',
+    name: name,
+    content: content,
+    time: new Date().toISOString()
+  };
+  if (lsGet(TOKEN_KEY)) {
+    let existing = [];
+    try {
+      const f = await ghGetFile('messages.json', true);
+      if (f) existing = JSON.parse(f.content).messages || [];
+    } catch (e) { /* messages.json 可能不存在 */ }
+    const updated = { version: 1, messages: [msg].concat(existing) };
+    await ghPutFile('messages.json', JSON.stringify(updated, null, 2), '新增留言 ' + msg.id);
+    return { msg: msg, synced: true };
+  }
+  lsSet(LOCAL_MSG_KEY, JSON.stringify([msg].concat(localMessages())));
+  return { msg: msg, synced: false };
+}
+
+/* 删除留言：有 token 删 GitHub，无 token 删本地 */
+async function deleteMessage(id) {
+  if (lsGet(TOKEN_KEY)) {
+    let existing = [];
+    try {
+      const f = await ghGetFile('messages.json', true);
+      if (f) existing = JSON.parse(f.content).messages || [];
+    } catch (e) { return; }
+    const rest = existing.filter(function (m) { return m.id !== id; });
+    await ghPutFile('messages.json', JSON.stringify({ version: 1, messages: rest }, null, 2), '删除留言 ' + id);
+  } else {
+    lsSet(LOCAL_MSG_KEY, JSON.stringify(localMessages().filter(function (m) { return m.id !== id; })));
+  }
 }
