@@ -78,7 +78,7 @@
     grid.innerHTML = '';
     emptyEl.style.display = photos.length ? 'none' : 'block';
     countEl.innerHTML = '<b>' + photos.length + '</b> 段时光';
-    syncEl.innerHTML = '<span class="pulse-dot"></span>' + (SOURCE_LABEL[photos._source] || '');
+    syncEl.style.display = 'none';
 
     const visible = expanded ? photos : photos.slice(0, SHOW_INITIAL);
     visible.forEach(function (p, idx) { buildCard(p, idx); });
@@ -88,7 +88,8 @@
     const moreBtn = document.getElementById('moreBtn');
     if (photos.length > SHOW_INITIAL && moreWrap) {
       moreWrap.style.display = 'block';
-      moreBtn.textContent = expanded ? '收起' : '查看更多照片（共 ' + photos.length + ' 张）';
+      moreBtn.innerHTML = expanded ? '收起 <span class="m-arrow">▴</span>' : '更多 <span class="m-arrow">▾</span>';
+      moreBtn.title = '还有 ' + (photos.length - SHOW_INITIAL) + ' 张照片';
     } else if (moreWrap) {
       moreWrap.style.display = 'none';
     }
