@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-08-15T07:34:56.518Z",
+  "updated": "2026-08-15T07:35:06.261Z",
   "updatedBy": "yuzengyang",
   "photos": [
     {
@@ -103,16 +103,6 @@
       "tags": [],
       "created": "2026-08-15T03:32:51.317Z",
       "visibility": "private"
-    },
-    {
-      "id": "20260815-104320-x0g",
-      "file": "photos/20260815-104320-x0g.jpg",
-      "location": "",
-      "date": "2026-08-15",
-      "caption": "",
-      "author": "yuzengyang",
-      "tags": [],
-      "created": "2026-08-15T02:43:20.985Z"
     }
   ]
 }
