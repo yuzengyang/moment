@@ -1,8 +1,19 @@
 {
   "version": 1,
-  "updated": "2026-08-15T07:58:12.845Z",
+  "updated": "2026-08-15T07:59:49.750Z",
   "updatedBy": "yuzengyang",
   "photos": [
+    {
+      "id": "20260815-155943-dvq",
+      "file": "photos/20260815-155943-dvq.jpg",
+      "location": "洛阳",
+      "date": "2025-05-28",
+      "caption": "",
+      "author": "yuzengyang",
+      "tags": [],
+      "visibility": "public",
+      "created": "2026-08-15T07:59:43.697Z"
+    },
     {
       "id": "20260815-155806-jf7",
       "file": "photos/20260815-155806-jf7.jpg",
