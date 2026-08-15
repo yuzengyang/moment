@@ -19,7 +19,13 @@
   const modalBadges = document.getElementById('modalBadges');
   const modalCount = document.getElementById('modalCount');
 
-  modalImg.addEventListener('error', function () { modalImg.src = PLACEHOLDER; });
+  modalImg.addEventListener('error', function () {
+    if (modalImg.src.indexOf('raw.githubusercontent.com') > -1) {
+      modalImg.src = modalImg.src.replace('raw.githubusercontent.com/', 'cdn.jsdelivr.net/gh/').replace('/main/', '@main/');
+    } else if (modalImg.src.indexOf('cdn.jsdelivr.net') === -1) {
+      modalImg.src = PLACEHOLDER;
+    }
+  });
 
   const PLACEHOLDER = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><rect width="400" height="400" fill="#FDF1E7"/>' +
@@ -59,7 +65,7 @@
 
     const img = card.querySelector('img');
     img.addEventListener('load', function () { img.classList.add('loaded'); });
-    img.addEventListener('error', function () { img.src = PLACEHOLDER; img.classList.add('loaded'); });
+    img.addEventListener('error', function () { fallbackImg(img); });
 
     card.addEventListener('click', function () { openModal(idx); });
     grid.appendChild(card);
@@ -140,6 +146,16 @@
     return String(s == null ? '' : s)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
+  }
+
+  /* 图片加载失败：raw → jsDelivr（国内 CDN）→ 占位图 */
+  function fallbackImg(img) {
+    if (img.src.indexOf('raw.githubusercontent.com') > -1) {
+      img.src = img.src.replace('raw.githubusercontent.com/', 'cdn.jsdelivr.net/gh/').replace('/main/', '@main/');
+    } else if (img.src.indexOf('cdn.jsdelivr.net') === -1) {
+      img.src = PLACEHOLDER;
+      img.classList.add('loaded');
+    }
   }
 
   function svgPin() {
