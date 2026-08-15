@@ -246,10 +246,21 @@
             '<div class="field" style="margin:0"><label>日期</label><input class="input up-date" type="date" value="' + iso + '"></div>' +
           '</div>' +
           '<div class="field" style="margin:0"><label>想说的话</label><textarea class="input textarea up-cap" placeholder="这家店的面很香，下次还要一起来。"></textarea></div>' +
+          '<div class="field" style="margin:0"><label>种类</label><div class="cat-toggle">' +
+            CATEGORIES.map(function (c) {
+              return '<span class="cat-opt" data-cat="' + c.key + '" style="cursor:pointer">' + c.name + '</span>';
+            }).join('') +
+          '</div></div>' +
           '<div style="text-align:right"><button class="btn btn-ghost btn-sm up-remove" type="button">移除</button></div>' +
         '</div>';
 
       el.querySelector('.up-remove').addEventListener('click', function () { removeFileAt(i); });
+      el.querySelectorAll('.cat-opt').forEach(function (opt) {
+        opt.addEventListener('click', function () {
+          el.querySelectorAll('.cat-opt').forEach(function (o) { o.classList.remove('active'); });
+          opt.classList.add('active');
+        });
+      });
       els.uploadList.appendChild(el);
     });
   }
@@ -263,12 +274,14 @@
       if (!p || p.status !== 'ready' || !p.dataUrl) return;
       const tags = [];
       item.querySelectorAll('.tag-opt.active').forEach(function (b) { tags.push(b.dataset.key); });
+      const catEl = item.querySelector('.cat-opt.active');
       entries.push({
         dataUrl: p.dataUrl,
         location: item.querySelector('.up-loc').value.trim(),
         date: item.querySelector('.up-date').value,
         caption: item.querySelector('textarea.up-cap').value.trim(),
         tags: tags,
+        category: catEl ? catEl.dataset.cat : '',
         author: currentUser
       });
     });
@@ -296,6 +309,7 @@
           date: e.date,
           caption: e.caption,
           tags: e.tags,
+          category: e.category,
           author: e.author
         };
       });
@@ -385,7 +399,7 @@
       item.innerHTML =
         '<div class="m-thumb"><img src="' + rawUrl + '" alt=""></div>' +
         '<div class="m-info">' +
-          '<div class="m-loc">' + esc(p.location || '地点待补充') + (p.visibility === 'private' ? ' <span class="vis-tag">仅我可见</span>' : '') + '</div>' +
+          '<div class="m-loc">' + esc(p.location || '地点待补充') + (p.category ? ' <span class="cat-badge">' + categoryName(p.category) + '</span>' : '') + (p.visibility === 'private' ? ' <span class="vis-tag">仅我可见</span>' : '') + '</div>' +
           '<div class="m-cap">' + esc(p.caption || '没有留下文字') + '</div>' +
           '<div class="m-date">' + esc(fmtDate(p.date || p.created)) + ' · 上传于 ' + esc(fmtDateTime(p.created)) + '</div>' +
         '</div>' +
@@ -481,6 +495,13 @@
             '<option value="private"' + (p.visibility === 'private' ? ' selected' : '') + '>仅我可见（不在展览页展示）</option>' +
           '</select>' +
         '</div>' +
+        '<div class="field" style="margin:0"><label>种类</label>' +
+          '<select class="select e-cat">' +
+            '<option value="">未分类</option>' +
+            '<option value="scenery"' + (p.category === 'scenery' ? ' selected' : '') + '>美景</option>' +
+            '<option value="food"' + (p.category === 'food' ? ' selected' : '') + '>美食</option>' +
+          '</select>' +
+        '</div>' +
         '<div class="field" style="margin:0"><label>想说的话</label><textarea class="input textarea e-cap">' + esc(p.caption || '') + '</textarea></div>' +
         '<div class="field" style="margin:0">' +
           '<label>伙伴</label><div class="badge-row e-tags">' +
@@ -512,7 +533,8 @@
           date: editArea.querySelector('.e-date').value,
           caption: editArea.querySelector('.e-cap').value.trim(),
           tags: tags,
-          visibility: editArea.querySelector('.e-vis').value
+          visibility: editArea.querySelector('.e-vis').value,
+          category: editArea.querySelector('.e-cat').value
         };
         updatePhoto(id, patch, currentUser).then(function () {
           editArea.remove();
