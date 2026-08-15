@@ -399,7 +399,7 @@
       item.innerHTML =
         '<div class="m-thumb"><img src="' + rawUrl + '" alt=""></div>' +
         '<div class="m-info">' +
-          '<div class="m-loc">' + esc(p.location || '地点待补充') + (p.category ? ' <span class="cat-badge">' + categoryName(p.category) + '</span>' : '') + (p.visibility === 'private' ? ' <span class="vis-tag">仅我可见</span>' : '') + '</div>' +
+          '<div class="m-loc">' + esc(p.location || '地点待补充') + (p.category ? ' <span class="cat-badge" data-cat="' + p.category + '">' + categoryName(p.category) + '</span>' : '') + (p.visibility === 'private' ? ' <span class="vis-tag">仅我可见</span>' : '') + '</div>' +
           '<div class="m-cap">' + esc(p.caption || '没有留下文字') + '</div>' +
           '<div class="m-date">' + esc(fmtDate(p.date || p.created)) + ' · 上传于 ' + esc(fmtDateTime(p.created)) + '</div>' +
         '</div>' +
@@ -498,6 +498,7 @@
         '<div class="field" style="margin:0"><label>种类</label><div class="cat-toggle e-cats">' +
           '<span class="cat-opt' + (p.category === 'scenery' ? ' active' : '') + '" data-cat="scenery" style="cursor:pointer">美景</span>' +
           '<span class="cat-opt' + (p.category === 'food' ? ' active' : '') + '" data-cat="food" style="cursor:pointer">美食</span>' +
+          '<span class="cat-opt' + (p.category === 'us' ? ' active' : '') + '" data-cat="us" style="cursor:pointer">我们</span>' +
         '</div></div>' +
         '<div class="field" style="margin:0"><label>想说的话</label><textarea class="input textarea e-cap">' + esc(p.caption || '') + '</textarea></div>' +
         '<div style="display:flex;gap:8px;justify-content:flex-end">' +
