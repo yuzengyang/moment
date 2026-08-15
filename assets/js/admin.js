@@ -35,8 +35,17 @@
     els.toast.textContent = msg;
     els.toast.className = 'toast show' + (kind ? ' ' + kind : '');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () { els.toast.className = 'toast'; }, 3200);
+    toastTimer = setTimeout(function () { els.toast.className = 'toast'; }, 5000);
   }
+
+  /* 全局错误捕获：任何未捕获错误都弹出，便于定位 */
+  window.addEventListener('error', function (e) {
+    toast('页面出错：' + (e.message || '未知错误') + '（' + (e.filename || '').split('/').pop() + ':' + e.lineno + '）', 'err');
+  });
+  window.addEventListener('unhandledrejection', function (e) {
+    const msg = (e.reason && e.reason.message) ? e.reason.message : '未知错误';
+    toast('操作失败：' + msg, 'err');
+  });
 
   /* ---------- 登录守卫 ---------- */
 
@@ -191,11 +200,13 @@
   }
 
   async function doUpload() {
+    if (els.uploadBtn.disabled) return;
     els.uploadBtn.disabled = true;
     els.uploadBtn.textContent = '正在准备…';
     try {
       const entries = collectEntries();
       if (!entries.length) { toast('先选几张照片吧', 'err'); return; }
+      toast('开始处理 ' + entries.length + ' 张照片…', 'ok');
 
       // 逐张压缩
       const prepared = [];
@@ -214,6 +225,7 @@
         });
       }
       els.uploadBtn.textContent = '写入照片 ' + prepared.length + ' 张…';
+      toast('照片处理完成，正在写入…', 'ok');
       const n = await uploadPhotos(prepared);
       pendingFiles = [];
       renderUploadList();
