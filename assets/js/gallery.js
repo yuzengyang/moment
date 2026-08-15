@@ -23,11 +23,11 @@
 
   modalImg.addEventListener('error', function () {
     const cur = modalImg.src;
-    const m1 = cur.match(/https:\/\/([^/]+)\.github\.io\/([^/]+)\/(.+)/);
+    const m1 = cur.match(/raw\.githubusercontent\.com\/([^/]+)\/([^/]+)\/main\/(.+)/);
     if (m1) { modalImg.src = 'https://cdn.jsdelivr.net/gh/' + m1[1] + '/' + m1[2] + '@main/' + m1[3]; return; }
-    const m2 = cur.match(/https:\/\/cdn\.jsdelivr\.net\/gh\/([^/]+)\/([^@]+)@main\/(.+)/);
-    if (m2) { modalImg.src = 'https://raw.githubusercontent.com/' + m2[1] + '/' + m2[2] + '/main/' + m2[3]; return; }
-    if (cur.indexOf('raw.githubusercontent.com') > -1 || cur.indexOf('blob:') !== 0) modalImg.src = PLACEHOLDER;
+    const m2 = cur.match(/cdn\.jsdelivr\.net\/gh\/([^/]+)\/([^@]+)@main\/(.+)/);
+    if (m2) { modalImg.src = 'https://' + m2[1] + '.github.io/' + m2[2] + '/' + m2[3]; return; }
+    if (cur.indexOf('blob:') !== 0) modalImg.src = PLACEHOLDER;
   });
 
   const PLACEHOLDER = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(
@@ -161,21 +161,18 @@
       .replace(/"/g, '&quot;');
   }
 
-  /* 图片加载失败逐级兜底：Pages 静态 → jsDelivr CDN → raw → 占位图 */
+  /* 图片加载失败逐级兜底：raw（实时）→ jsDelivr CDN → Pages 静态 → 占位图 */
   function fallbackImg(img) {
     const cur = img.src;
-    if (cur.indexOf('github.io') > -1) {
-      // Pages 静态失败 → jsDelivr
-      const m = cur.match(/https:\/\/([^/]+)\.github\.io\/([^/]+)\/(.+)/);
+    if (cur.indexOf('raw.githubusercontent.com') > -1) {
+      const m = cur.match(/raw\.githubusercontent\.com\/([^/]+)\/([^/]+)\/main\/(.+)/);
       if (m) img.src = 'https://cdn.jsdelivr.net/gh/' + m[1] + '/' + m[2] + '@main/' + m[3];
-      else img.src = PLACEHOLDER;
+      else { img.src = PLACEHOLDER; img.classList.add('loaded'); }
     } else if (cur.indexOf('cdn.jsdelivr.net') > -1) {
-      // jsDelivr 失败 → raw
-      const m = cur.match(/https:\/\/cdn\.jsdelivr\.net\/gh\/([^/]+)\/([^@]+)@main\/(.+)/);
-      if (m) img.src = 'https://raw.githubusercontent.com/' + m[1] + '/' + m[2] + '/main/' + m[3];
-      else img.src = PLACEHOLDER;
-    } else if (cur.indexOf('raw.githubusercontent.com') > -1) {
-      // raw 失败 → 占位
+      const m = cur.match(/cdn\.jsdelivr\.net\/gh\/([^/]+)\/([^@]+)@main\/(.+)/);
+      if (m) img.src = 'https://' + m[1] + '.github.io/' + m[2] + '/' + m[3];
+      else { img.src = PLACEHOLDER; img.classList.add('loaded'); }
+    } else if (cur.indexOf('github.io') > -1) {
       img.src = PLACEHOLDER;
       img.classList.add('loaded');
     } else if (cur.indexOf('blob:') !== 0) {
