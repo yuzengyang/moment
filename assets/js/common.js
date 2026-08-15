@@ -186,3 +186,14 @@ function parseExifDate(view, tiff) {
   }
   return null;
 }
+
+/* ============ 导航栏滚动收缩 ============ */
+(function () {
+  const nav = document.querySelector('.nav');
+  if (!nav) return;
+  const onScroll = function () {
+    nav.classList.toggle('compact', window.scrollY > 80);
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+})();
