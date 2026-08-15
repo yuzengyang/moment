@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-08-15T16:21:06.050Z",
+  "updated": "2026-08-15T16:21:14.778Z",
   "updatedBy": "yuzengyang",
   "photos": [
     {
@@ -180,7 +180,8 @@
       "author": "yuzengyang",
       "tags": [],
       "visibility": "public",
-      "created": "2026-08-15T08:04:10.312Z"
+      "created": "2026-08-15T08:04:10.312Z",
+      "category": "us"
     },
     {
       "id": "20260815-160148-97n",
