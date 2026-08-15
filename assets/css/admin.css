@@ -48,6 +48,10 @@
   border: 1px solid var(--line); border-radius: 16px; padding: 12px; background: #FFFDFB;
 }
 .upload-item .up-thumb { width: 92px; height: 92px; border-radius: 12px; overflow: hidden; background: var(--cream-deep); }
+.up-status { display: block; font-size: 0.78rem; margin-bottom: 6px; font-weight: 500; }
+.up-status.processing { color: var(--apricot); }
+.up-status.ready { color: #3D7A52; }
+.up-status.error { color: #C9554F; }
 .upload-item .up-thumb img { width: 100%; height: 100%; object-fit: cover; }
 .upload-item .up-fields { display: flex; flex-direction: column; gap: 10px; }
 .upload-item .up-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
