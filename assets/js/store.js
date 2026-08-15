@@ -334,6 +334,7 @@ async function uploadPhotos(entries, onProgress) {
         caption: e.caption || '',
         author: e.author,
         tags: e.tags || [],
+        category: e.category || '',
         visibility: 'public',
         created: new Date().toISOString()
       };
@@ -379,6 +380,7 @@ async function uploadPhotos(entries, onProgress) {
       caption: e.caption || '',
       author: e.author,
       tags: e.tags || [],
+      category: e.category || '',
       visibility: 'public',
       created: new Date().toISOString()
     });
