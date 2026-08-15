@@ -73,7 +73,7 @@
 }
 .photo-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
 .photo-card .thumb {
-  position: relative; overflow: hidden; aspect-ratio: 1 / 1;
+  position: relative; overflow: hidden; aspect-ratio: 3 / 4;
   background: linear-gradient(110deg, #F6E6DA 30%, #FDF1E7 50%, #F6E6DA 70%);
   background-size: 200% 100%; animation: shimmer 1.5s linear infinite;
 }
