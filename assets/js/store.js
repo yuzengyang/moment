@@ -248,8 +248,9 @@ async function loadGalleryPhotos() {
       if (f) {
         const data = JSON.parse(f.content);
         if (Array.isArray(data.photos) && data.photos.length) {
+          const pub = data.photos.filter(function (p) { return p.visibility !== 'private'; });
           return {
-            photos: data.photos.map(function (p) {
+            photos: pub.map(function (p) {
               return Object.assign({}, p, { url: photoRawUrl(p.file) });
             }),
             source: 'github-live'
@@ -261,8 +262,9 @@ async function loadGalleryPhotos() {
 
   const fresh = await loadGithubPhotosAnon();
   if (fresh && fresh.length) {
+    const pub = fresh.filter(function (p) { return p.visibility !== 'private'; });
     return {
-      photos: fresh.map(function (p) {
+      photos: pub.map(function (p) {
         return Object.assign({}, p, { url: photoRawUrl(p.file) });
       }),
       source: 'github-live'
@@ -274,6 +276,7 @@ async function loadGalleryPhotos() {
     const photos = [];
     for (let i = 0; i < metas.length; i++) {
       const p = metas[i];
+      if (p.visibility === 'private') continue;
       const blob = await getBlobDB(p.id);
       const url = blob ? URL.createObjectURL(blob) : null;
       photos.push(Object.assign({}, p, { url: url }));
@@ -331,6 +334,7 @@ async function uploadPhotos(entries, onProgress) {
         caption: e.caption || '',
         author: e.author,
         tags: e.tags || [],
+        visibility: 'public',
         created: new Date().toISOString()
       };
       try {
@@ -375,6 +379,7 @@ async function uploadPhotos(entries, onProgress) {
       caption: e.caption || '',
       author: e.author,
       tags: e.tags || [],
+      visibility: 'public',
       created: new Date().toISOString()
     });
     if (onProgress) onProgress(i + 1, entries.length);
