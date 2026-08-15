@@ -495,46 +495,32 @@
             '<option value="private"' + (p.visibility === 'private' ? ' selected' : '') + '>仅我可见（不在展览页展示）</option>' +
           '</select>' +
         '</div>' +
-        '<div class="field" style="margin:0"><label>种类</label>' +
-          '<select class="select e-cat">' +
-            '<option value="">未分类</option>' +
-            '<option value="scenery"' + (p.category === 'scenery' ? ' selected' : '') + '>美景</option>' +
-            '<option value="food"' + (p.category === 'food' ? ' selected' : '') + '>美食</option>' +
-          '</select>' +
-        '</div>' +
+        '<div class="field" style="margin:0"><label>种类</label><div class="cat-toggle e-cats">' +
+          '<span class="cat-opt' + (p.category === 'scenery' ? ' active' : '') + '" data-cat="scenery" style="cursor:pointer">美景</span>' +
+          '<span class="cat-opt' + (p.category === 'food' ? ' active' : '') + '" data-cat="food" style="cursor:pointer">美食</span>' +
+        '</div></div>' +
         '<div class="field" style="margin:0"><label>想说的话</label><textarea class="input textarea e-cap">' + esc(p.caption || '') + '</textarea></div>' +
-        '<div class="field" style="margin:0">' +
-          '<label>伙伴</label><div class="badge-row e-tags">' +
-          COMPANIONS.map(function (c) {
-            const on = (p.tags || []).indexOf(c.key) !== -1;
-            return '<span class="badge tag-opt' + (on ? ' active' : '') + '" data-key="' + c.key + '" style="cursor:pointer;border-color:' + (on ? c.color : '') + '"><img src="' + c.file + '" alt="">' + c.name + '</span>';
-          }).join('') +
-          '</div>' +
-        '</div>' +
         '<div style="display:flex;gap:8px;justify-content:flex-end">' +
           '<button class="btn btn-ghost btn-sm e-cancel" type="button">取消</button>' +
           '<button class="btn btn-primary btn-sm e-save" type="button">保存修改</button>' +
         '</div>';
       item.appendChild(editArea);
 
-      editArea.querySelectorAll('.tag-opt').forEach(function (badge) {
-        badge.addEventListener('click', function () {
-          const on = badge.classList.toggle('active');
-          const c = companionByKey(badge.dataset.key);
-          badge.style.borderColor = on && c ? c.color : '';
+      editArea.querySelectorAll('.cat-opt').forEach(function (opt) {
+        opt.addEventListener('click', function () {
+          editArea.querySelectorAll('.cat-opt').forEach(function (o) { o.classList.remove('active'); });
+          opt.classList.add('active');
         });
       });
       editArea.querySelector('.e-cancel').addEventListener('click', function () { editArea.remove(); editingId = null; });
       editArea.querySelector('.e-save').addEventListener('click', function () {
-        const tags = [];
-        editArea.querySelectorAll('.tag-opt.active').forEach(function (b) { tags.push(b.dataset.key); });
+        const catEl = editArea.querySelector('.cat-opt.active');
         const patch = {
           location: editArea.querySelector('.e-loc').value.trim(),
           date: editArea.querySelector('.e-date').value,
           caption: editArea.querySelector('.e-cap').value.trim(),
-          tags: tags,
           visibility: editArea.querySelector('.e-vis').value,
-          category: editArea.querySelector('.e-cat').value
+          category: catEl ? catEl.dataset.cat : ''
         };
         updatePhoto(id, patch, currentUser).then(function () {
           editArea.remove();
