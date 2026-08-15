@@ -108,3 +108,81 @@ function decodeBase64Utf8(b64) {
 function lsGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
 function lsSet(key, val) { try { localStorage.setItem(key, val); } catch (e) {} }
 function lsDel(key) { try { localStorage.removeItem(key); } catch (e) {} }
+
+/* ============ EXIF 拍摄日期读取 ============ */
+
+/* 读取 JPEG 的 EXIF 拍摄日期（DateTimeOriginal 或 DateTime），返回 'YYYY-MM-DD' 或 null */
+function readExifDate(file) {
+  return new Promise(function (resolve) {
+    const reader = new FileReader();
+    reader.onerror = function () { resolve(null); };
+    reader.onload = function () {
+      try {
+        const view = new DataView(reader.result);
+        if (view.byteLength < 4 || view.getUint16(0, false) !== 0xFFD8) { resolve(null); return; }
+        let offset = 2;
+        while (offset + 4 < view.byteLength) {
+          if (view.getUint8(offset) !== 0xFF) { resolve(null); return; }
+          const marker = view.getUint8(offset + 1);
+          if (marker === 0xDA || marker === 0xD9) { resolve(null); return; }
+          const segLen = view.getUint16(offset + 2, false);
+          if (marker === 0xE1 && offset + 10 <= view.byteLength) {
+            if (view.getUint8(offset + 4) === 0x45 && view.getUint8(offset + 5) === 0x78 &&
+                view.getUint8(offset + 6) === 0x69 && view.getUint8(offset + 7) === 0x66 &&
+                view.getUint8(offset + 8) === 0x00 && view.getUint8(offset + 9) === 0x00) {
+              const dt = parseExifDate(view, offset + 10);
+              resolve(dt);
+              return;
+            }
+          }
+          offset += 2 + segLen;
+        }
+        resolve(null);
+      } catch (e) { resolve(null); }
+    };
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+function parseExifDate(view, tiff) {
+  if (tiff + 8 > view.byteLength) return null;
+  const b0 = view.getUint8(tiff), b1 = view.getUint8(tiff + 1);
+  let little;
+  if (b0 === 0x49 && b1 === 0x49) little = true;
+  else if (b0 === 0x4D && b1 === 0x4D) little = false;
+  else return null;
+  const rd16 = function (o) { return view.getUint16(o, little); };
+  const rd32 = function (o) { return view.getUint32(o, little); };
+  if (rd16(tiff + 2) !== 0x002A) return null;
+  const ifd0 = rd32(tiff + 4);
+  if (tiff + ifd0 + 2 > view.byteLength) return null;
+  const n = rd16(tiff + ifd0);
+  for (let i = 0; i < n; i++) {
+    const e = tiff + ifd0 + 2 + i * 12;
+    if (e + 12 > view.byteLength) break;
+    const tag = rd16(e);
+    if (tag !== 0x9003 && tag !== 0x0132) continue;
+    const type = rd16(e + 2);
+    const count = rd32(e + 4);
+    if (type !== 2) continue;
+    let str = '';
+    if (count <= 4) {
+      for (let k = 0; k < count; k++) {
+        const c = view.getUint8(e + 8 + k);
+        if (c === 0) break;
+        str += String.fromCharCode(c);
+      }
+    } else {
+      const vo = rd32(e + 8);
+      for (let k = 0; k < count; k++) {
+        const c = view.getUint8(tiff + vo + k);
+        if (c === 0) break;
+        str += String.fromCharCode(c);
+      }
+    }
+    const m = str.match(/^(\d{4}):(\d{2}):(\d{2})/);
+    if (m) return m[1] + '-' + m[2] + '-' + m[3];
+    return null;
+  }
+  return null;
+}
