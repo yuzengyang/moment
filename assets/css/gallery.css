@@ -98,24 +98,29 @@
 .photo-card .meta .who { font-size: 0.78rem; color: var(--peach); font-weight: 500; }
 
 /* ---------- 周计划 ---------- */
-.weekly-plan { max-width: 1180px; margin: 30px auto 0; padding: 0 24px; }
-.wp-head { text-align: center; margin-bottom: 16px; }
+.weekly-plan { max-width: 720px; margin: 40px auto 0; padding: 0 24px; }
+.wp-head { text-align: center; margin-bottom: 18px; }
+.wp-title { display: flex; align-items: center; justify-content: center; gap: 12px; }
 .wp-head h2 {
   font-family: "KaiTi", "STKaiti", "楷体", serif;
   font-size: 1.4rem; font-weight: 500; letter-spacing: 0.14em; color: var(--ink);
 }
 .wp-head p { color: var(--ink-soft); font-size: 0.84rem; margin-top: 6px; letter-spacing: 0.08em; }
 .wp-card {
-  background: #fff; border: 1px solid rgba(240, 223, 210, 0.8); border-radius: 20px;
-  box-shadow: var(--shadow); padding: 22px 26px; text-align: center;
+  background: linear-gradient(160deg, #FFFDFB, #FFF4EF);
+  border: 1.5px solid var(--peach-soft); border-radius: 20px;
+  box-shadow: var(--shadow); padding: 26px 28px; text-align: center;
 }
-.wp-content { font-size: 1.08rem; color: var(--ink); line-height: 1.8; word-break: break-word; }
-.wp-meta { font-size: 0.8rem; color: var(--ink-soft); margin-top: 8px; letter-spacing: 0.04em; }
+.wp-content { font-size: 1.12rem; color: var(--ink); line-height: 1.8; word-break: break-word; }
+.wp-meta { font-size: 0.8rem; color: var(--ink-soft); margin-top: 10px; letter-spacing: 0.04em; }
 .wp-countdown {
-  margin-top: 14px; font-size: 1.15rem; font-weight: 600; color: var(--peach);
-  font-variant-numeric: tabular-nums; letter-spacing: 0.04em;
+  display: inline-block; margin-top: 16px; padding: 10px 26px;
+  background: linear-gradient(135deg, #FFB6A3, #F2767E); color: #fff;
+  border-radius: 999px; font-weight: 600; font-size: 1rem;
+  font-variant-numeric: tabular-nums; letter-spacing: 0.06em;
+  box-shadow: 0 8px 20px rgba(242, 118, 126, 0.3);
 }
-.wp-score { margin-top: 14px; font-size: 1.2rem; font-weight: 600; }
+.wp-score { margin-top: 16px; font-size: 1.25rem; font-weight: 600; }
 .wp-score.pass { color: #3D7A52; }
 .wp-score.fail { color: #C9554F; }
 .wp-hist { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
