@@ -107,22 +107,29 @@
 }
 .wp-head p { color: var(--ink-soft); font-size: 0.84rem; margin-top: 6px; letter-spacing: 0.08em; }
 .wp-card {
-  background: linear-gradient(160deg, #FFFDFB, #FFF4EF);
-  border: 1.5px solid var(--peach-soft); border-radius: 20px;
-  box-shadow: var(--shadow); padding: 26px 28px; text-align: center;
+  background: #2C3238; border: 10px solid #A9713F; border-radius: 18px;
+  box-shadow: 0 14px 34px rgba(60, 40, 20, 0.32);
+  padding: 30px 30px; text-align: center; position: relative;
 }
-.wp-content { font-size: 1.12rem; color: var(--ink); line-height: 1.8; word-break: break-word; }
-.wp-meta { font-size: 0.8rem; color: var(--ink-soft); margin-top: 10px; letter-spacing: 0.04em; }
+.wp-card::before {
+  content: ''; position: absolute; inset: 8px; border: 2px dashed rgba(255, 255, 255, 0.14);
+  border-radius: 8px; pointer-events: none;
+}
+.wp-content {
+  font-size: 1.18rem; color: #F5F0E3; line-height: 1.8; word-break: break-word;
+  font-family: "KaiTi", "STKaiti", "楷体", serif; letter-spacing: 0.06em;
+}
+.wp-meta { font-size: 0.8rem; color: rgba(245, 240, 227, 0.55); margin-top: 10px; letter-spacing: 0.04em; }
 .wp-countdown {
   display: inline-block; margin-top: 16px; padding: 10px 26px;
-  background: linear-gradient(135deg, #FFB6A3, #F2767E); color: #fff;
-  border-radius: 999px; font-weight: 600; font-size: 1rem;
+  background: rgba(255, 255, 255, 0.1); color: #FFDE7A;
+  border: 1px dashed rgba(255, 222, 122, 0.4); border-radius: 999px;
+  font-weight: 600; font-size: 1rem;
   font-variant-numeric: tabular-nums; letter-spacing: 0.06em;
-  box-shadow: 0 8px 20px rgba(242, 118, 126, 0.3);
 }
-.wp-score { margin-top: 16px; font-size: 1.25rem; font-weight: 600; }
-.wp-score.pass { color: #3D7A52; }
-.wp-score.fail { color: #C9554F; }
+.wp-score { margin-top: 16px; font-size: 1.3rem; font-weight: 600; }
+.wp-score.pass { color: #A8D89A; }
+.wp-score.fail { color: #FF9E9E; }
 .wp-hist-title { margin-top: 20px; text-align: center; font-size: 0.9rem; color: var(--ink-soft); letter-spacing: 0.1em; }
 .wp-hist { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
 .wp-hist-item {
@@ -193,6 +200,18 @@
 .modal-info .m-loc svg { width: 18px; height: 18px; color: var(--peach); flex: none; }
 .modal-info .m-date { font-size: 0.85rem; color: var(--ink-soft); margin-bottom: 16px; }
 .modal-info .m-cap { font-size: 0.98rem; color: var(--ink); line-height: 1.9; margin-bottom: 18px; white-space: pre-line; }
+/* 评论区 */
+.cmt-box { margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--line); }
+.cmt-head { font-size: 0.85rem; font-weight: 600; color: var(--ink); margin-bottom: 8px; letter-spacing: 0.06em; }
+.cmt-list { display: flex; flex-direction: column; gap: 8px; max-height: 190px; overflow-y: auto; }
+.cmt-empty { color: var(--ink-soft); font-size: 0.82rem; }
+.cmt-item { display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; font-size: 0.86rem; }
+.cmt-author { color: var(--peach); font-weight: 600; flex: none; font-size: 0.8rem; }
+.cmt-content { color: var(--ink); flex: 1; word-break: break-word; line-height: 1.6; }
+.cmt-time { color: var(--ink-soft); font-size: 0.72rem; flex: none; }
+.cmt-form { display: flex; gap: 8px; margin-top: 10px; }
+.cmt-form .input { flex: 1; }
+
 .modal-info .m-count { font-size: 0.78rem; color: var(--ink-soft); opacity: 0.8; margin-bottom: 10px; letter-spacing: 0.05em; }
 .modal-info .m-meta { margin-top: auto; padding-top: 16px; border-top: 1px dashed var(--line); display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; color: var(--ink-soft); }
 .modal-close {
