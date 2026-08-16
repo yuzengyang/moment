@@ -60,17 +60,17 @@ input, textarea, select { font-family: inherit; font-size: 1rem; color: var(--in
   background: rgba(255, 253, 250, 0.96);
   box-shadow: 0 8px 28px rgba(190, 140, 110, 0.20);
 }
-.brand { display: flex; align-items: center; gap: 12px; font-family: "KaiTi", "STKaiti", "Kaiti SC", "楷体", "KaiTi_GB2312", serif; font-size: 1.1rem; letter-spacing: 0.14em; }
+.brand { display: flex; align-items: center; gap: 12px; font-family: "KaiTi", "STKaiti", "Kaiti SC", "楷体", "KaiTi_GB2312", serif; font-size: 1.3rem; font-weight: 600; letter-spacing: 0.12em; color: var(--ink); }
 .brand svg { width: 26px; height: 26px; flex: none; }
 .brand .brand-sub {
   color: var(--peach); font-family: "Palatino Linotype", "Book Antiqua", "Palatino", Georgia, serif;
-  font-style: italic; font-size: 0.82rem; letter-spacing: 0.16em; margin-top: 3px; font-weight: 500;
+  font-style: italic; font-size: 0.88rem; letter-spacing: 0.16em; margin-top: 3px; font-weight: 600;
 }
 
 .nav-links { display: flex; align-items: center; gap: 6px; }
 .nav-link {
-  padding: 7px 16px; border-radius: 999px; font-size: 0.9rem;
-  color: var(--ink-soft); transition: all .2s ease; border: 1px solid transparent;
+  padding: 7px 18px; border-radius: 999px; font-size: 0.98rem; font-weight: 600;
+  color: var(--ink); transition: all .2s ease; border: 1px solid transparent;
 }
 .nav-link:hover { color: var(--ink); background: var(--cream-deep); }
 .nav-link.primary { background: var(--peach); color: #fff; box-shadow: 0 6px 16px rgba(242, 118, 126, 0.35); }
