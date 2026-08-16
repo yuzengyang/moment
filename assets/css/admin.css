@@ -15,7 +15,14 @@
 .pl-content { font-size: 1rem; color: var(--ink); line-height: 1.7; word-break: break-word; }
 .pl-meta { font-size: 0.78rem; color: var(--ink-soft); margin-top: 6px; }
 .pl-countdown { margin-top: 10px; font-weight: 600; color: var(--peach); font-size: 0.95rem; font-variant-numeric: tabular-nums; }
-.pl-score-box { display: flex; gap: 8px; margin-top: 12px; }
+.pl-score-box { margin-top: 14px; }
+.pl-score-box label { display: block; font-size: 0.82rem; color: var(--ink-soft); margin-bottom: 6px; }
+.pl-score-row { display: flex; gap: 8px; }
+.pl-ops { margin-top: 12px; text-align: right; }
+.pl-edit { margin-top: 12px; padding: 14px; background: #FFFDFB; border: 1px dashed var(--peach-soft); border-radius: 12px; display: flex; flex-direction: column; gap: 10px; }
+.pl-edit-row { display: flex; gap: 8px; align-items: flex-end; }
+.pl-edit-row .field { flex: 1; }
+.pl-edit-row .btn { flex: none; }
 .pl-score { flex: 1; max-width: 160px; }
 .pl-wait { margin-top: 10px; color: var(--ink-soft); font-size: 0.85rem; }
 .pl-result { margin-top: 10px; font-weight: 600; font-size: 1rem; }
