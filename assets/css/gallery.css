@@ -123,7 +123,8 @@
 .wp-score { margin-top: 16px; font-size: 1.25rem; font-weight: 600; }
 .wp-score.pass { color: #3D7A52; }
 .wp-score.fail { color: #C9554F; }
-.wp-hist { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+.wp-hist-title { margin-top: 20px; text-align: center; font-size: 0.9rem; color: var(--ink-soft); letter-spacing: 0.1em; }
+.wp-hist { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
 .wp-hist-item {
   display: flex; justify-content: space-between; align-items: center; gap: 12px;
   background: #FFFDFB; border: 1px solid rgba(240, 223, 210, 0.7); border-radius: 12px;
