@@ -1,8 +1,8 @@
 /* ============ Our Moments · 共享常量与工具 ============ */
 
 const ACCOUNTS = {
-  wenlinshu: { password: 'yuzengyang', name: '温琳舒', role: '她' },
-  yuzengyang: { password: 'wenlinshu', name: '于增洋', role: '他' }
+  wenlinshu: { password: 'yyyuzengyang', name: '温琳舒', role: '她' },
+  yuzengyang: { password: 'wwwenlinshu', name: '于增洋', role: '他' }
 };
 
 const COMPANIONS = [
