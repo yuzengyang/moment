@@ -175,8 +175,9 @@
       cmts.forEach(function (c) {
         const item = document.createElement('div');
         item.className = 'cmt-item';
+        const who = (c.author && ACCOUNTS[c.author]) ? authorName(c.author) : '我们';
         item.innerHTML =
-          '<span class="cmt-author">我们</span>' +
+          '<span class="cmt-author" style="color:' + authorColor(c.author) + '">' + esc(who) + '</span>' +
           '<span class="cmt-content">' + esc(c.content) + '</span>' +
           '<span class="cmt-time">' + esc(fmtDateOnly(c.time)) + '</span>';
         list.appendChild(item);
@@ -248,7 +249,8 @@
       const p = currentList[currentIndex];
       if (!p) return;
       cmtSubmit.disabled = true;
-      addComment(p.id, content, 'owner').then(function () {
+      const author = lsGet('om_user') || 'owner';
+      addComment(p.id, content, author).then(function () {
         input.value = '';
         cmtSubmit.disabled = false;
         renderComments(p.id);
