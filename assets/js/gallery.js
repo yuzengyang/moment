@@ -169,15 +169,6 @@
       .replace(/"/g, '&quot;');
   }
 
-  /* 页脚更新日期：只显示 YYYY-MM-DD */
-  function fmtDateOnly(iso) {
-    if (!iso) return '';
-    const d = new Date(iso);
-    if (isNaN(d)) return iso;
-    const p = function (n) { return String(n).padStart(2, '0'); };
-    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
-  }
-
   /* 图片加载失败逐级兜底：raw（实时）→ jsDelivr CDN → Pages 静态 → 占位图 */
   function fallbackImg(img) {
     const cur = img.src;
@@ -386,7 +377,7 @@
           '<div class="wp-meta">' + esc(who) + ' 提交 · ' + esc(fmtDateOnly(cur.startTime)) + '</div>' +
           statusHtml +
         '</div>' +
-        (hist ? '<div class="wp-hist">' + hist + '</div>' : '');
+        (hist ? '<div class="wp-hist-title">过去周计划</div><div class="wp-hist">' + hist + '</div>' : '');
 
       // 倒计时实时刷新
       if (st === 'pending') {
