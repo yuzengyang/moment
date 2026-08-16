@@ -32,6 +32,8 @@
     msgList: document.getElementById('msgList'),
     msgCount: document.getElementById('msgCount'),
     planPanel: document.getElementById('planPanel'),
+    cmtAdminList: document.getElementById('cmtAdminList'),
+    cmtCount: document.getElementById('cmtCount'),
     yearFilter: document.getElementById('yearFilter'),
     progressWrap: document.getElementById('progressWrap'),
     progressFill: document.getElementById('progressFill'),
@@ -483,6 +485,41 @@
     });
   }
 
+  /* 照片评论管理 */
+  async function refreshCmtList() {
+    const cmts = await loadAllComments();
+    const photos = await loadPhotos();
+    els.cmtCount.textContent = '共 ' + cmts.length + ' 条';
+    els.cmtAdminList.innerHTML = '';
+    if (!cmts.length) {
+      els.cmtAdminList.innerHTML = '<p style="color:var(--ink-soft);font-size:.88rem;padding:10px 0">还没有照片评论。</p>';
+      return;
+    }
+    cmts.forEach(function (c) {
+      const photo = photos.find(function (p) { return p.id === c.photoId; });
+      const loc = photo ? (photo.location || '未命名照片') : '照片';
+      const item = document.createElement('div');
+      item.className = 'manage-item';
+      item.innerHTML =
+        '<div class="gb-avatar">评</div>' +
+        '<div class="m-info">' +
+          '<div class="m-loc">' + esc(loc) + '</div>' +
+          '<div class="m-cap" style="white-space:pre-wrap">' + esc(c.content) + '</div>' +
+          '<div class="m-date">' + esc(fmtDateTime(c.time)) + '</div>' +
+        '</div>' +
+        '<div class="m-ops"><button class="btn btn-danger btn-sm op-cmt-del">删除</button></div>';
+      item.querySelector('.op-cmt-del').addEventListener('click', function () {
+        if (!confirm('删除这条评论？')) return;
+        deleteComment(c.id).then(function () {
+          toast('评论已删除', 'ok');
+          refreshCmtList();
+          notifySync();
+        }).catch(function (err) { toast('删除失败：' + err.message, 'err'); });
+      });
+      els.cmtAdminList.appendChild(item);
+    });
+  }
+
   /* 周计划 */
   async function refreshPlanPanel() {
     const plans = await loadPlans();
@@ -825,6 +862,7 @@
     refreshManageList();
     refreshMsgList();
     refreshPlanPanel();
+    refreshCmtList();
   }
 
   /* 关键按钮用事件委托，即使初始化某步出错也能响应 */
