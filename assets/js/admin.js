@@ -514,8 +514,15 @@
 
     const hasPending = cur && planStatus(cur) === 'pending';
     if (currentUser === 'wenlinshu' && !hasPending) {
-      html += '<div class="pl-new"><textarea class="input pl-new-content" placeholder="写下本周计划…"></textarea>' +
-        '<button class="btn btn-primary pl-submit-btn">提交周计划</button></div>';
+      const def = new Date(Date.now() + 7 * 24 * 3600 * 1000);
+      const iso = def.getFullYear() + '-' + String(def.getMonth() + 1).padStart(2, '0') + '-' + String(def.getDate()).padStart(2, '0');
+      html += '<div class="pl-new">' +
+        '<div class="pl-new-row">' +
+          '<div class="field" style="margin:0"><label>目标日期（截止）</label><input class="input pl-new-date" type="date" value="' + iso + '"></div>' +
+          '<button class="btn btn-primary pl-submit-btn">提交周计划</button>' +
+        '</div>' +
+        '<textarea class="input pl-new-content" placeholder="写下本周计划…"></textarea>' +
+      '</div>';
     }
 
     if (plans.length > 1) {
@@ -549,11 +556,18 @@
       submitBtn.addEventListener('click', function () {
         const content = els.planPanel.querySelector('.pl-new-content').value.trim();
         if (!content) { toast('请填写计划内容', 'err'); return; }
-        submitPlan(content, currentUser).then(function (res) {
-          toast(res.synced ? '周计划已提交，开始 7 天倒计时' : '周计划已提交（本机）', 'ok');
+        const dateVal = els.planPanel.querySelector('.pl-new-date').value;
+        submitBtn.disabled = true;
+        submitBtn.textContent = '提交中…';
+        submitPlan(content, currentUser, dateVal).then(function (res) {
+          toast(res.synced ? '周计划已提交，倒计时开始' : '周计划已提交（本机）', 'ok');
           refreshPlanPanel();
           notifySync();
-        }).catch(function (err) { toast('提交失败：' + err.message, 'err'); });
+        }).catch(function (err) {
+          toast('提交失败：' + err.message, 'err');
+          submitBtn.disabled = false;
+          submitBtn.textContent = '提交周计划';
+        });
       });
     }
 
