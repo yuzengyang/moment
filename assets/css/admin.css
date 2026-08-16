@@ -10,6 +10,25 @@
 .panel-head h2 { font-family: var(--font-serif); font-size: 1.18rem; display: flex; align-items: center; gap: 10px; }
 .panel-head .sub { font-size: 0.8rem; color: var(--ink-soft); font-weight: 400; margin-top: 2px; }
 
+/* 周计划 */
+.pl-cur { background: #FFFDFB; border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+.pl-content { font-size: 1rem; color: var(--ink); line-height: 1.7; word-break: break-word; }
+.pl-meta { font-size: 0.78rem; color: var(--ink-soft); margin-top: 6px; }
+.pl-countdown { margin-top: 10px; font-weight: 600; color: var(--peach); font-size: 0.95rem; font-variant-numeric: tabular-nums; }
+.pl-score-box { display: flex; gap: 8px; margin-top: 12px; }
+.pl-score { flex: 1; max-width: 160px; }
+.pl-wait { margin-top: 10px; color: var(--ink-soft); font-size: 0.85rem; }
+.pl-result { margin-top: 10px; font-weight: 600; font-size: 1rem; }
+.pl-result.pass { color: #3D7A52; }
+.pl-result.fail { color: #C9554F; }
+.pl-new { margin-top: 4px; }
+.pl-new textarea { min-height: 64px; }
+.pl-new .btn { margin-top: 8px; }
+.pl-hist { display: flex; flex-direction: column; gap: 6px; }
+.pl-hist-item { display: flex; justify-content: space-between; gap: 10px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; font-size: 0.84rem; }
+.pl-hist-item span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pl-hist-score { flex: none; color: var(--ink-soft); font-size: 0.78rem; }
+
 /* 模式提示条 */
 .mode-bar {
   display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
