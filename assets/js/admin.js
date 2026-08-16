@@ -503,7 +503,7 @@
       item.innerHTML =
         '<div class="gb-avatar">评</div>' +
         '<div class="m-info">' +
-          '<div class="m-loc">' + esc(loc) + '</div>' +
+          '<div class="m-loc">' + esc(loc) + ' <span style="color:' + authorColor(c.author) + ';font-weight:500">' + esc(c.author && ACCOUNTS[c.author] ? authorName(c.author) : '我们') + '</span></div>' +
           '<div class="m-cap" style="white-space:pre-wrap">' + esc(c.content) + '</div>' +
           '<div class="m-date">' + esc(fmtDateTime(c.time)) + '</div>' +
         '</div>' +
