@@ -522,3 +522,81 @@ async function deleteMessage(id) {
     lsSet(LOCAL_MSG_KEY, JSON.stringify(localMessages().filter(function (m) { return m.id !== id; })));
   }
 }
+
+/* ============ 周计划 ============ */
+
+const LOCAL_PLAN_KEY = 'om_plans_local';
+const PLAN_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
+function localPlans() {
+  try { return JSON.parse(lsGet(LOCAL_PLAN_KEY) || '[]'); } catch (e) { return []; }
+}
+
+/* 读取周计划列表（GitHub 优先，本地兜底） */
+async function loadPlans() {
+  if (lsGet(TOKEN_KEY)) {
+    try {
+      const f = await ghGetFile('plans.json', true);
+      if (f) {
+        const d = JSON.parse(f.content);
+        if (Array.isArray(d.plans)) return d.plans;
+      }
+    } catch (e) {}
+  }
+  const data = await fetchGithubJson('plans.json');
+  if (data && Array.isArray(data.plans)) return data.plans;
+  return localPlans();
+}
+
+/* 提交新周计划（wenlinshu） */
+async function submitPlan(content, user) {
+  const now = Date.now();
+  const plan = {
+    id: genId() + '-plan',
+    content: content,
+    submitter: user,
+    startTime: new Date(now).toISOString(),
+    deadline: new Date(now + PLAN_WEEK_MS).toISOString(),
+    score: null,
+    scoredBy: null,
+    scoredAt: null
+  };
+  if (lsGet(TOKEN_KEY)) {
+    let existing = [];
+    try {
+      const f = await ghGetFile('plans.json', true);
+      if (f) existing = JSON.parse(f.content).plans || [];
+    } catch (e) {}
+    const updated = { version: 1, plans: [plan].concat(existing) };
+    await ghPutFile('plans.json', JSON.stringify(updated, null, 2), '提交周计划 ' + plan.id);
+    return { plan: plan, synced: true };
+  }
+  lsSet(LOCAL_PLAN_KEY, JSON.stringify([plan].concat(localPlans())));
+  return { plan: plan, synced: false };
+}
+
+/* 打分（yuzengyang），仅限倒计时内 */
+async function scorePlan(id, score, user) {
+  const plans = await loadPlans();
+  const idx = plans.findIndex(function (p) { return p.id === id; });
+  if (idx === -1) return false;
+  plans[idx].score = score;
+  plans[idx].scoredBy = user;
+  plans[idx].scoredAt = new Date().toISOString();
+
+  if (lsGet(TOKEN_KEY)) {
+    await ghPutFile('plans.json', JSON.stringify({ version: 1, plans: plans }, null, 2), '周计划评分 ' + id);
+  } else {
+    lsSet(LOCAL_PLAN_KEY, JSON.stringify(plans));
+  }
+  return true;
+}
+
+/* 周计划状态：pending（进行中）/ scored（已评分）/ expired（过期未评分） */
+function planStatus(p) {
+  if (p.score !== null && p.score !== undefined) return 'scored';
+  const now = Date.now();
+  const deadline = new Date(p.deadline).getTime();
+  if (now >= deadline) return 'expired';
+  return 'pending';
+}
