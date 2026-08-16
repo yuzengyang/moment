@@ -1,8 +1,20 @@
 {
   "version": 1,
-  "updated": "2026-08-15T16:22:55.087Z",
-  "updatedBy": "yuzengyang",
+  "updated": "2026-08-16T07:08:11.117Z",
+  "updatedBy": "wenlinshu",
   "photos": [
+    {
+      "id": "20260816-150801-sw0",
+      "file": "photos/20260816-150801-sw0.jpg",
+      "location": "宜昌",
+      "date": "2026-05-11",
+      "caption": "上山打野 路遇小猴",
+      "author": "wenlinshu",
+      "tags": [],
+      "category": "us",
+      "visibility": "public",
+      "created": "2026-08-16T07:08:01.366Z"
+    },
     {
       "id": "20260815-164524-67p",
       "file": "photos/20260815-164524-67p.jpg",
