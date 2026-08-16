@@ -437,6 +437,8 @@ async function loadUpdatedInfo() {
 /* ============ 留言板 ============ */
 
 const LOCAL_MSG_KEY = 'om_messages_local';
+// 留言板服务端中转地址（Cloudflare Worker）。部署后填入，例如 'https://xxx.workers.dev'
+const GUESTBOOK_API = '';
 
 function localMessages() {
   try { return JSON.parse(lsGet(LOCAL_MSG_KEY) || '[]'); } catch (e) { return []; }
@@ -477,6 +479,31 @@ async function addMessage(name, content) {
     await ghPutFile('messages.json', JSON.stringify(updated, null, 2), '新增留言 ' + msg.id);
     return { msg: msg, synced: true };
   }
+
+  // 无 token：通过服务端中转（匿名留言实时同步）
+  if (GUESTBOOK_API) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(function () { ctrl.abort(); }, 15000);
+    try {
+      const res = await fetch(GUESTBOOK_API + '/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name, content: content }),
+        signal: ctrl.signal
+      });
+      clearTimeout(timer);
+      if (res.ok) {
+        const data = await res.json();
+        return { msg: data.msg || msg, synced: true };
+      }
+      throw new Error('留言提交失败（' + res.status + '）');
+    } catch (e) {
+      clearTimeout(timer);
+      throw new Error(e.name === 'AbortError' ? '留言提交超时，请重试' : e.message);
+    }
+  }
+
+  // 兜底：未配置中转时存本地
   lsSet(LOCAL_MSG_KEY, JSON.stringify([msg].concat(localMessages())));
   return { msg: msg, synced: false };
 }
