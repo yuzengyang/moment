@@ -376,7 +376,11 @@
       }).join('');
 
       planBox.innerHTML =
-        '<div class="wp-head"><h2>周计划</h2><p>一周一约，互相督促</p></div>' +
+        '<div class="wp-head"><div class="wp-title">' +
+          '<svg viewBox="0 0 24 24" width="14" height="14" fill="#FFB6A3"><path d="M12 21s-7-4.6-9.3-9A5.4 5.4 0 0 1 12 6.3 5.4 5.4 0 0 1 21.3 12C19 16.4 12 21 12 21z"/></svg>' +
+          '<h2>周计划</h2>' +
+          '<svg viewBox="0 0 24 24" width="14" height="14" fill="#FFB6A3"><path d="M12 21s-7-4.6-9.3-9A5.4 5.4 0 0 1 12 6.3 5.4 5.4 0 0 1 21.3 12C19 16.4 12 21 12 21z"/></svg>' +
+        '</div><p>一周一约，互相督促</p></div>' +
         '<div class="wp-card">' +
           '<div class="wp-content">' + esc(cur.content) + '</div>' +
           '<div class="wp-meta">' + esc(who) + ' 提交 · ' + esc(fmtDateOnly(cur.startTime)) + '</div>' +
