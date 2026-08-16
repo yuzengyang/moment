@@ -159,6 +159,30 @@
     modalCap.textContent = p.caption || '这张照片还没有写下故事。';
     modalWho.textContent = p.author ? authorName(p.author) + ' 记录' : '';
     modalBadges.innerHTML = companionBadges(p.tags);
+    renderComments(p.id);
+  }
+
+  /* 评论区：有 token 者可评论 */
+  function renderComments(photoId) {
+    const list = document.getElementById('cmtList');
+    const form = document.getElementById('cmtForm');
+    list.innerHTML = '';
+    loadComments(photoId).then(function (cmts) {
+      if (!cmts.length) {
+        list.innerHTML = '<p class="cmt-empty">还没有评论</p>';
+        return;
+      }
+      cmts.forEach(function (c) {
+        const item = document.createElement('div');
+        item.className = 'cmt-item';
+        item.innerHTML =
+          '<span class="cmt-author">我们</span>' +
+          '<span class="cmt-content">' + esc(c.content) + '</span>' +
+          '<span class="cmt-time">' + esc(fmtDateOnly(c.time)) + '</span>';
+        list.appendChild(item);
+      });
+    });
+    form.style.display = lsGet(TOKEN_KEY) ? '' : 'none';
   }
 
   /* ---------- 工具 ---------- */
@@ -212,6 +236,26 @@
     moreBtn.addEventListener('click', function () {
       expanded = !expanded;
       render();
+    });
+  }
+
+  const cmtSubmit = document.getElementById('cmtSubmit');
+  if (cmtSubmit) {
+    cmtSubmit.addEventListener('click', function () {
+      const input = document.getElementById('cmtInput');
+      const content = input.value.trim();
+      if (!content) return;
+      const p = currentList[currentIndex];
+      if (!p) return;
+      cmtSubmit.disabled = true;
+      addComment(p.id, content, 'owner').then(function () {
+        input.value = '';
+        cmtSubmit.disabled = false;
+        renderComments(p.id);
+      }).catch(function (err) {
+        cmtSubmit.disabled = false;
+        alert('评论失败：' + err.message);
+      });
     });
   }
 
