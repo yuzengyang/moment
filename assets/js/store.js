@@ -335,7 +335,7 @@ async function uploadPhotos(entries, onProgress) {
         author: e.author,
         tags: e.tags || [],
         category: e.category || '',
-        visibility: 'public',
+        visibility: e.visibility || 'public',
         created: new Date().toISOString()
       };
       try {
@@ -381,7 +381,7 @@ async function uploadPhotos(entries, onProgress) {
       author: e.author,
       tags: e.tags || [],
       category: e.category || '',
-      visibility: 'public',
+      visibility: e.visibility || 'public',
       created: new Date().toISOString()
     });
     if (onProgress) onProgress(i + 1, entries.length);
