@@ -56,6 +56,13 @@ function authorName(key) {
   return ACCOUNTS[key] ? ACCOUNTS[key].name : key;
 }
 
+/* 评论/署名颜色：于增洋蓝、温琳舒粉 */
+function authorColor(key) {
+  if (key === 'yuzengyang') return '#5B8DB8';
+  if (key === 'wenlinshu') return '#E06A5E';
+  return '#F2767E';
+}
+
 function companionByKey(key) {
   return COMPANIONS.find(c => c.key === key);
 }
