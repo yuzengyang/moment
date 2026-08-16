@@ -32,6 +32,7 @@
     // 记住登录状态（仅本次会话）
     sessionStorage.setItem('om_session', user);
     sessionStorage.setItem('om_session_name', ACCOUNTS[user].name);
+    localStorage.setItem('om_user', user);
     location.href = 'admin.html';
   });
 
