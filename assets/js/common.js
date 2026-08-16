@@ -77,6 +77,19 @@ function genId() {
   return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}-${Math.random().toString(36).slice(2, 5)}`;
 }
 
+/* 倒计时：deadline(ISO) 距现在的剩余时间 */
+function fmtCountdown(deadlineIso) {
+  const ms = new Date(deadlineIso).getTime() - Date.now();
+  if (ms <= 0) return '已到时间';
+  const totalSec = Math.floor(ms / 1000);
+  const d = Math.floor(totalSec / 86400);
+  const h = Math.floor((totalSec % 86400) / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const sec = totalSec % 60;
+  const p = function (n) { return String(n).padStart(2, '0'); };
+  return d + ' 天 ' + p(h) + ' 小时 ' + p(m) + ' 分 ' + p(sec) + ' 秒';
+}
+
 /* 图片压缩：最长边 maxSide，JPEG quality，透明底填奶油色 */
 function compressImage(file, maxSide = 1920, quality = 0.85) {
   return new Promise((resolve, reject) => {
