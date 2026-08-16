@@ -251,6 +251,12 @@
               return '<span class="cat-opt" data-cat="' + c.key + '" style="cursor:pointer">' + c.name + '</span>';
             }).join('') +
           '</div></div>' +
+          '<div class="field" style="margin:0"><label>可见性</label>' +
+            '<select class="select up-vis">' +
+              '<option value="public" selected>公开（展览页展示）</option>' +
+              '<option value="private">仅我可见</option>' +
+            '</select>' +
+          '</div>' +
           '<div style="text-align:right"><button class="btn btn-ghost btn-sm up-remove" type="button">移除</button></div>' +
         '</div>';
 
@@ -280,6 +286,7 @@
         caption: item.querySelector('textarea.up-cap').value.trim(),
         tags: [],
         category: catEl ? catEl.dataset.cat : '',
+        visibility: item.querySelector('.up-vis').value,
         author: currentUser
       });
     });
@@ -308,6 +315,7 @@
           caption: e.caption,
           tags: e.tags,
           category: e.category,
+          visibility: e.visibility,
           author: e.author
         };
       });
