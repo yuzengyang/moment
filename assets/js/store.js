@@ -643,3 +643,72 @@ async function deletePlan(id) {
   }
   return true;
 }
+
+/* ============ 照片评论 ============ */
+
+const LOCAL_CMT_KEY = 'om_comments_local';
+
+function localComments() {
+  try { return JSON.parse(lsGet(LOCAL_CMT_KEY) || '[]'); } catch (e) { return []; }
+}
+
+/* 读取全部评论 */
+async function loadAllComments() {
+  if (lsGet(TOKEN_KEY)) {
+    try {
+      const f = await ghGetFile('comments.json', true);
+      if (f) {
+        const d = JSON.parse(f.content);
+        if (Array.isArray(d.comments)) return d.comments;
+      }
+    } catch (e) {}
+  }
+  const data = await fetchGithubJson('comments.json');
+  if (data && Array.isArray(data.comments)) return data.comments;
+  return localComments();
+}
+
+/* 某张照片的评论 */
+async function loadComments(photoId) {
+  const all = await loadAllComments();
+  return all.filter(function (c) { return c.photoId === photoId; });
+}
+
+/* 新增评论（仅持有 Token 者，即站主本人） */
+async function addComment(photoId, content, author) {
+  const c = {
+    id: genId() + '-c',
+    photoId: photoId,
+    content: content,
+    author: author || 'owner',
+    time: new Date().toISOString()
+  };
+  if (lsGet(TOKEN_KEY)) {
+    let existing = [];
+    try {
+      const f = await ghGetFile('comments.json', true);
+      if (f) existing = JSON.parse(f.content).comments || [];
+    } catch (e) {}
+    const updated = { version: 1, comments: [c].concat(existing) };
+    await ghPutFile('comments.json', JSON.stringify(updated, null, 2), '照片评论 ' + c.id);
+    return { comment: c, synced: true };
+  }
+  lsSet(LOCAL_CMT_KEY, JSON.stringify([c].concat(localComments())));
+  return { comment: c, synced: false };
+}
+
+/* 删除评论 */
+async function deleteComment(id) {
+  if (lsGet(TOKEN_KEY)) {
+    let existing = [];
+    try {
+      const f = await ghGetFile('comments.json', true);
+      if (f) existing = JSON.parse(f.content).comments || [];
+    } catch (e) { return false; }
+    const rest = existing.filter(function (c) { return c.id !== id; });
+    await ghPutFile('comments.json', JSON.stringify({ version: 1, comments: rest }, null, 2), '删除照片评论 ' + id);
+  } else {
+    lsSet(LOCAL_CMT_KEY, JSON.stringify(localComments().filter(function (c) { return c.id !== id; })));
+  }
+  return true;
+}
