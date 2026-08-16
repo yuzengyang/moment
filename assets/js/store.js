@@ -437,8 +437,8 @@ async function loadUpdatedInfo() {
 /* ============ 留言板 ============ */
 
 const LOCAL_MSG_KEY = 'om_messages_local';
-// 留言板服务端中转地址（Cloudflare Worker）。部署后填入，例如 'https://xxx.workers.dev'
-const GUESTBOOK_API = '';
+// 留言板服务端中转地址（Cloudflare Worker），匿名留言经此写入 GitHub
+const GUESTBOOK_API = 'https://our-moments.zengyangyu.workers.dev';
 
 function localMessages() {
   try { return JSON.parse(lsGet(LOCAL_MSG_KEY) || '[]'); } catch (e) { return []; }
