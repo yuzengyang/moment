@@ -2,6 +2,16 @@
   "version": 1,
   "plans": [
     {
+      "id": "20260816-213252-5p1-plan",
+      "content": "好好学习",
+      "submitter": "wenlinshu",
+      "startTime": "2026-08-16T13:32:52.267Z",
+      "deadline": "2026-08-23T15:59:59.000Z",
+      "score": null,
+      "scoredBy": null,
+      "scoredAt": null
+    },
+    {
       "id": "20260816-211215-8k1-plan",
       "content": "今天我的周计划是天天开心",
       "submitter": "wenlinshu",
