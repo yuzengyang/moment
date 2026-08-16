@@ -1,8 +1,20 @@
 {
   "version": 1,
-  "updated": "2026-08-16T07:20:00.419Z",
+  "updated": "2026-08-16T07:27:17.491Z",
   "updatedBy": "wenlinshu",
   "photos": [
+    {
+      "id": "20260816-152709-7kj",
+      "file": "photos/20260816-152709-7kj.jpg",
+      "location": "武汉",
+      "date": "2026-07-31",
+      "caption": "带噜噜一起来看夕阳，什么时候能和于增洋看一场盛大的夕阳呢？",
+      "author": "wenlinshu",
+      "tags": [],
+      "category": "scenery",
+      "visibility": "public",
+      "created": "2026-08-16T07:27:09.133Z"
+    },
     {
       "id": "20260816-151728-ak9",
       "file": "photos/20260816-151728-ak9.jpg",
