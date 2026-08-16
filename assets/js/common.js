@@ -90,6 +90,15 @@ function fmtCountdown(deadlineIso) {
   return d + ' 天 ' + p(h) + ' 小时 ' + p(m) + ' 分 ' + p(sec) + ' 秒';
 }
 
+/* 日期（YYYY-MM-DD） */
+function fmtDateOnly(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (isNaN(d)) return iso;
+  const p = function (n) { return String(n).padStart(2, '0'); };
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+}
+
 /* 图片压缩：最长边 maxSide，JPEG quality，透明底填奶油色 */
 function compressImage(file, maxSide = 1920, quality = 0.85) {
   return new Promise((resolve, reject) => {
