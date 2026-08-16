@@ -498,8 +498,9 @@
       if (st === 'pending') {
         html += '<div class="pl-countdown" id="plCountdown">剩余 ' + fmtCountdown(cur.deadline) + '</div>';
         if (currentUser === 'yuzengyang') {
-          html += '<div class="pl-score-box"><input class="input pl-score" type="number" min="0" max="100" placeholder="打分 0-100">' +
-            '<button class="btn btn-primary btn-sm pl-score-btn">提交评分</button></div>';
+          html += '<div class="pl-score-box"><label>评分（60 分以上合格）</label><div class="pl-score-row">' +
+            '<input class="input pl-score" type="number" min="0" max="100" placeholder="打分 0-100">' +
+            '<button class="btn btn-primary btn-sm pl-score-btn">提交评分</button></div></div>';
         } else {
           html += '<div class="pl-wait">⏳ 等待 yuzengyang 评分</div>';
         }
@@ -509,6 +510,7 @@
       } else {
         html += '<div class="pl-result fail">已过期 · 未评分</div>';
       }
+      html += '<div class="pl-ops"><button class="btn btn-ghost btn-sm pl-edit-btn">编辑计划</button></div>';
       html += '</div>';
     }
 
@@ -550,6 +552,14 @@
       });
     }
 
+    // 编辑计划（两人均可）
+    const editBtn = els.planPanel.querySelector('.pl-edit-btn');
+    if (editBtn) {
+      editBtn.addEventListener('click', function () {
+        startPlanEdit(cur);
+      });
+    }
+
     // 提交新计划
     const submitBtn = els.planPanel.querySelector('.pl-submit-btn');
     if (submitBtn) {
@@ -580,6 +590,43 @@
         else clearInterval(window.__plTimer);
       }, 1000);
     }
+  }
+
+  /* 编辑周计划表单（两人均可） */
+  function startPlanEdit(plan) {
+    const oldBox = els.planPanel.querySelector('.pl-edit');
+    if (oldBox) oldBox.remove();
+
+    const dStr = plan.deadline ? fmtDateOnly(plan.deadline) : '';
+    const box = document.createElement('div');
+    box.className = 'pl-edit';
+    box.innerHTML =
+      '<div class="field" style="margin:0"><label>计划内容</label><textarea class="input pl-edit-content">' + esc(plan.content || '') + '</textarea></div>' +
+      '<div class="pl-edit-row">' +
+        '<div class="field" style="margin:0"><label>截止日期</label><input class="input pl-edit-date" type="date" value="' + esc(dStr) + '"></div>' +
+        '<button class="btn btn-primary btn-sm pl-edit-save">保存</button>' +
+        '<button class="btn btn-ghost btn-sm pl-edit-cancel">取消</button>' +
+      '</div>';
+    els.planPanel.appendChild(box);
+
+    box.querySelector('.pl-edit-cancel').addEventListener('click', function () { box.remove(); });
+    box.querySelector('.pl-edit-save').addEventListener('click', function () {
+      const content = box.querySelector('.pl-edit-content').value.trim();
+      if (!content) { toast('计划内容不能为空', 'err'); return; }
+      const dateVal = box.querySelector('.pl-edit-date').value;
+      const btn = box.querySelector('.pl-edit-save');
+      btn.disabled = true;
+      btn.textContent = '保存中…';
+      updatePlan(plan.id, { content: content, deadline: dateVal }, currentUser).then(function () {
+        toast('计划已更新', 'ok');
+        refreshPlanPanel();
+        notifySync();
+      }).catch(function (err) {
+        toast('保存失败：' + err.message, 'err');
+        btn.disabled = false;
+        btn.textContent = '保存';
+      });
+    });
   }
 
   /* 内联编辑 */
