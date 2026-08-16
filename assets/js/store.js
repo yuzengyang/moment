@@ -548,15 +548,20 @@ async function loadPlans() {
   return localPlans();
 }
 
-/* 提交新周计划（wenlinshu） */
-async function submitPlan(content, user) {
+/* 提交新周计划（wenlinshu）。targetDate 为目标日期（YYYY-MM-DD，可选，默认提交后 7 天） */
+async function submitPlan(content, user, targetDate) {
   const now = Date.now();
+  let deadlineMs = now + PLAN_WEEK_MS;
+  if (targetDate) {
+    const t = new Date(targetDate + 'T23:59:59').getTime();
+    if (!isNaN(t)) deadlineMs = t;
+  }
   const plan = {
     id: genId() + '-plan',
     content: content,
     submitter: user,
     startTime: new Date(now).toISOString(),
-    deadline: new Date(now + PLAN_WEEK_MS).toISOString(),
+    deadline: new Date(deadlineMs).toISOString(),
     score: null,
     scoredBy: null,
     scoredAt: null
