@@ -493,29 +493,31 @@
       const st = planStatus(cur);
       html += '<div class="pl-cur">';
       html += '<div class="pl-content">' + esc(cur.content) + '</div>';
-      html += '<div class="pl-meta">' + esc(authorName(cur.submitter)) + ' 提交 · ' + esc(fmtDateOnly(cur.startTime)) + ' · 截止 ' + esc(fmtDateOnly(cur.deadline)) + '</div>';
+      html += '<div class="pl-meta">' + esc(authorName(cur.submitter)) + ' 提交 · 截止 ' + esc(fmtDateOnly(cur.deadline)) + '</div>';
 
       if (st === 'pending') {
         html += '<div class="pl-countdown" id="plCountdown">剩余 ' + fmtCountdown(cur.deadline) + '</div>';
-        if (currentUser === 'yuzengyang') {
-          html += '<div class="pl-score-box"><label>评分（60 分以上合格）</label><div class="pl-score-row">' +
-            '<input class="input pl-score" type="number" min="0" max="100" placeholder="打分 0-100">' +
-            '<button class="btn btn-primary btn-sm pl-score-btn">提交评分</button></div></div>';
-        } else {
-          html += '<div class="pl-wait">⏳ 等待 yuzengyang 评分</div>';
-        }
+        // 打分（两人均可）
+        html += '<div class="pl-score-box"><label>评分（60 分以上合格）</label><div class="pl-score-row">' +
+          '<input class="input pl-score" type="number" min="0" max="100" placeholder="打分 0-100">' +
+          '<button class="btn btn-primary btn-sm pl-score-btn">提交评分</button></div></div>';
       } else if (st === 'scored') {
         const pass = cur.score >= 60;
         html += '<div class="pl-result ' + (pass ? 'pass' : 'fail') + '">' + cur.score + ' 分 · ' + (pass ? '合格 ✓' : '不合格') + '（' + esc(authorName(cur.scoredBy)) + ' 评）</div>';
       } else {
         html += '<div class="pl-result fail">已过期 · 未评分</div>';
       }
-      html += '<div class="pl-ops"><button class="btn btn-ghost btn-sm pl-edit-btn">编辑计划</button></div>';
+
+      // 编辑 + 删除（两人均可）
+      html += '<div class="pl-ops">' +
+        '<button class="btn btn-ghost btn-sm pl-edit-btn">编辑</button>' +
+        '<button class="btn btn-danger btn-sm pl-del-btn">删除</button>' +
+      '</div>';
       html += '</div>';
     }
 
-    const hasPending = cur && planStatus(cur) === 'pending';
-    if (currentUser === 'wenlinshu' && !hasPending) {
+    // 提交新计划（wenlinshu 且无进行中计划）
+    if (currentUser === 'wenlinshu' && (!cur || planStatus(cur) !== 'pending')) {
       const def = new Date(Date.now() + 7 * 24 * 3600 * 1000);
       const iso = def.getFullYear() + '-' + String(def.getMonth() + 1).padStart(2, '0') + '-' + String(def.getDate()).padStart(2, '0');
       html += '<div class="pl-new">' +
@@ -527,17 +529,23 @@
       '</div>';
     }
 
+    // 过去周计划栏目（历史 + 删除）
     if (plans.length > 1) {
+      html += '<div class="pl-hist-title">过去周计划</div>';
       html += '<div class="pl-hist">' + plans.slice(1).map(function (p) {
         const s = planStatus(p);
         const line = s === 'scored' ? (p.score + ' 分 · ' + (p.score >= 60 ? '合格' : '不合格')) : (s === 'expired' ? '已过期未评分' : '进行中');
-        return '<div class="pl-hist-item"><span>' + esc(p.content) + '</span><span class="pl-hist-score">' + esc(line) + '</span></div>';
+        return '<div class="pl-hist-item">' +
+          '<span class="pl-hist-content">' + esc(p.content) + '</span>' +
+          '<span class="pl-hist-score">' + esc(line) + '</span>' +
+          '<button class="btn btn-danger btn-sm pl-hist-del" data-id="' + p.id + '">删除</button>' +
+        '</div>';
       }).join('') + '</div>';
     }
 
     els.planPanel.innerHTML = html || '<p style="color:var(--ink-soft)">暂无周计划，wenlinshu 可提交第一个计划。</p>';
 
-    // 打分
+    // 打分（两人均可）
     const scoreBtn = els.planPanel.querySelector('.pl-score-btn');
     if (scoreBtn) {
       scoreBtn.addEventListener('click', function () {
@@ -551,6 +559,32 @@
         }).catch(function (err) { toast('评分失败：' + err.message, 'err'); });
       });
     }
+
+    // 删除当前计划
+    const delBtn = els.planPanel.querySelector('.pl-del-btn');
+    if (delBtn) {
+      delBtn.addEventListener('click', function () {
+        if (!confirm('删除这条周计划？')) return;
+        deletePlan(cur.id).then(function () {
+          toast('已删除', 'ok');
+          refreshPlanPanel();
+          notifySync();
+        }).catch(function (err) { toast('删除失败：' + err.message, 'err'); });
+      });
+    }
+
+    // 删除历史计划
+    els.planPanel.querySelectorAll('.pl-hist-del').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const id = btn.dataset.id;
+        if (!confirm('删除这条历史周计划？')) return;
+        deletePlan(id).then(function () {
+          toast('已删除', 'ok');
+          refreshPlanPanel();
+          notifySync();
+        }).catch(function (err) { toast('删除失败：' + err.message, 'err'); });
+      });
+    });
 
     // 编辑计划（两人均可）
     const editBtn = els.planPanel.querySelector('.pl-edit-btn');
@@ -592,7 +626,6 @@
     }
   }
 
-  /* 编辑周计划表单（两人均可） */
   function startPlanEdit(plan) {
     const oldBox = els.planPanel.querySelector('.pl-edit');
     if (oldBox) oldBox.remove();
