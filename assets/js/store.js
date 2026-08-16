@@ -627,3 +627,19 @@ async function updatePlan(id, patch, user) {
   }
   return true;
 }
+
+/* 删除周计划（两人均可） */
+async function deletePlan(id) {
+  if (lsGet(TOKEN_KEY)) {
+    let existing = [];
+    try {
+      const f = await ghGetFile('plans.json', true);
+      if (f) existing = JSON.parse(f.content).plans || [];
+    } catch (e) { return false; }
+    const rest = existing.filter(function (p) { return p.id !== id; });
+    await ghPutFile('plans.json', JSON.stringify({ version: 1, plans: rest }, null, 2), '删除周计划 ' + id);
+  } else {
+    lsSet(LOCAL_PLAN_KEY, JSON.stringify(localPlans().filter(function (p) { return p.id !== id; })));
+  }
+  return true;
+}
