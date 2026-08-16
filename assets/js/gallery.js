@@ -271,6 +271,7 @@
     render();
     fillUpdatedInfo();
     renderMessages();
+    renderPlans();
   }
 
   async function reload() {
@@ -280,6 +281,7 @@
     render();
     fillUpdatedInfo();
     renderMessages();
+    renderPlans();
   }
 
   /* ---------- 留言板 ---------- */
@@ -339,6 +341,60 @@
         btn.disabled = false;
         btn.textContent = '留下足迹';
       });
+    });
+  }
+
+  /* ---------- 周计划 ---------- */
+
+  const planBox = document.getElementById('weeklyPlan');
+
+  function renderPlans() {
+    loadPlans().then(function (plans) {
+      if (!plans || !plans.length) {
+        planBox.innerHTML = '';
+        return;
+      }
+      const cur = plans[0];
+      const st = planStatus(cur);
+      const who = authorName(cur.submitter);
+
+      let statusHtml = '';
+      if (st === 'pending') {
+        statusHtml = '<div class="wp-countdown" id="wpCountdown">剩余 ' + fmtCountdown(cur.deadline) + '</div>';
+      } else if (st === 'scored') {
+        const pass = cur.score >= 60;
+        statusHtml = '<div class="wp-score ' + (pass ? 'pass' : 'fail') + '">' + cur.score + ' 分 · ' + (pass ? '合格 ✓' : '不合格') + '</div>' +
+          '<div class="wp-meta">由 ' + authorName(cur.scoredBy) + ' 评分</div>';
+      } else {
+        statusHtml = '<div class="wp-score fail">已过期 · 未评分</div>';
+      }
+
+      const hist = plans.slice(1).map(function (p) {
+        const s = planStatus(p);
+        const line = s === 'scored' ? (p.score + ' 分 · ' + (p.score >= 60 ? '合格' : '不合格')) : (s === 'expired' ? '已过期未评分' : '进行中');
+        return '<div class="wp-hist-item"><span>' + esc(p.content) + '</span><span class="wp-hist-score">' + esc(line) + '</span></div>';
+      }).join('');
+
+      planBox.innerHTML =
+        '<div class="wp-head"><h2>周计划</h2><p>一周一约，互相督促</p></div>' +
+        '<div class="wp-card">' +
+          '<div class="wp-content">' + esc(cur.content) + '</div>' +
+          '<div class="wp-meta">' + esc(who) + ' 提交 · ' + esc(fmtDateOnly(cur.startTime)) + '</div>' +
+          statusHtml +
+        '</div>' +
+        (hist ? '<div class="wp-hist">' + hist + '</div>' : '');
+
+      // 倒计时实时刷新
+      if (st === 'pending') {
+        clearInterval(window.__wpTimer);
+        window.__wpTimer = setInterval(function () {
+          const el = document.getElementById('wpCountdown');
+          if (el) el.textContent = '剩余 ' + fmtCountdown(cur.deadline);
+          else clearInterval(window.__wpTimer);
+        }, 1000);
+      } else {
+        clearInterval(window.__wpTimer);
+      }
     });
   }
 
