@@ -605,3 +605,25 @@ function planStatus(p) {
   if (now >= deadline) return 'expired';
   return 'pending';
 }
+
+/* 编辑周计划（内容/截止日期），两人均可 */
+async function updatePlan(id, patch, user) {
+  const plans = await loadPlans();
+  const idx = plans.findIndex(function (p) { return p.id === id; });
+  if (idx === -1) return false;
+
+  if (patch.content !== undefined && patch.content !== null) {
+    plans[idx].content = patch.content;
+  }
+  if (patch.deadline) {
+    const t = new Date(patch.deadline + 'T23:59:59').getTime();
+    if (!isNaN(t)) plans[idx].deadline = new Date(t).toISOString();
+  }
+
+  if (lsGet(TOKEN_KEY)) {
+    await ghPutFile('plans.json', JSON.stringify({ version: 1, plans: plans }, null, 2), '编辑周计划 ' + id);
+  } else {
+    lsSet(LOCAL_PLAN_KEY, JSON.stringify(plans));
+  }
+  return true;
+}
