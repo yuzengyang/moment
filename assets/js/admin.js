@@ -31,6 +31,7 @@
     toast: document.getElementById('toast'),
     msgList: document.getElementById('msgList'),
     msgCount: document.getElementById('msgCount'),
+    planPanel: document.getElementById('planPanel'),
     yearFilter: document.getElementById('yearFilter'),
     progressWrap: document.getElementById('progressWrap'),
     progressFill: document.getElementById('progressFill'),
@@ -482,6 +483,91 @@
     });
   }
 
+  /* 周计划 */
+  async function refreshPlanPanel() {
+    const plans = await loadPlans();
+    const cur = plans[0];
+    let html = '';
+
+    if (cur) {
+      const st = planStatus(cur);
+      html += '<div class="pl-cur">';
+      html += '<div class="pl-content">' + esc(cur.content) + '</div>';
+      html += '<div class="pl-meta">' + esc(authorName(cur.submitter)) + ' 提交 · ' + esc(fmtDateOnly(cur.startTime)) + ' · 截止 ' + esc(fmtDateOnly(cur.deadline)) + '</div>';
+
+      if (st === 'pending') {
+        html += '<div class="pl-countdown" id="plCountdown">剩余 ' + fmtCountdown(cur.deadline) + '</div>';
+        if (currentUser === 'yuzengyang') {
+          html += '<div class="pl-score-box"><input class="input pl-score" type="number" min="0" max="100" placeholder="打分 0-100">' +
+            '<button class="btn btn-primary btn-sm pl-score-btn">提交评分</button></div>';
+        } else {
+          html += '<div class="pl-wait">⏳ 等待 yuzengyang 评分</div>';
+        }
+      } else if (st === 'scored') {
+        const pass = cur.score >= 60;
+        html += '<div class="pl-result ' + (pass ? 'pass' : 'fail') + '">' + cur.score + ' 分 · ' + (pass ? '合格 ✓' : '不合格') + '（' + esc(authorName(cur.scoredBy)) + ' 评）</div>';
+      } else {
+        html += '<div class="pl-result fail">已过期 · 未评分</div>';
+      }
+      html += '</div>';
+    }
+
+    const hasPending = cur && planStatus(cur) === 'pending';
+    if (currentUser === 'wenlinshu' && !hasPending) {
+      html += '<div class="pl-new"><textarea class="input pl-new-content" placeholder="写下本周计划…"></textarea>' +
+        '<button class="btn btn-primary pl-submit-btn">提交周计划</button></div>';
+    }
+
+    if (plans.length > 1) {
+      html += '<div class="pl-hist">' + plans.slice(1).map(function (p) {
+        const s = planStatus(p);
+        const line = s === 'scored' ? (p.score + ' 分 · ' + (p.score >= 60 ? '合格' : '不合格')) : (s === 'expired' ? '已过期未评分' : '进行中');
+        return '<div class="pl-hist-item"><span>' + esc(p.content) + '</span><span class="pl-hist-score">' + esc(line) + '</span></div>';
+      }).join('') + '</div>';
+    }
+
+    els.planPanel.innerHTML = html || '<p style="color:var(--ink-soft)">暂无周计划，wenlinshu 可提交第一个计划。</p>';
+
+    // 打分
+    const scoreBtn = els.planPanel.querySelector('.pl-score-btn');
+    if (scoreBtn) {
+      scoreBtn.addEventListener('click', function () {
+        const inp = els.planPanel.querySelector('.pl-score');
+        const score = Number(inp.value);
+        if (isNaN(score) || score < 0 || score > 100) { toast('请输入 0-100 的分数', 'err'); return; }
+        scorePlan(cur.id, score, currentUser).then(function () {
+          toast('评分成功', 'ok');
+          refreshPlanPanel();
+          notifySync();
+        }).catch(function (err) { toast('评分失败：' + err.message, 'err'); });
+      });
+    }
+
+    // 提交新计划
+    const submitBtn = els.planPanel.querySelector('.pl-submit-btn');
+    if (submitBtn) {
+      submitBtn.addEventListener('click', function () {
+        const content = els.planPanel.querySelector('.pl-new-content').value.trim();
+        if (!content) { toast('请填写计划内容', 'err'); return; }
+        submitPlan(content, currentUser).then(function (res) {
+          toast(res.synced ? '周计划已提交，开始 7 天倒计时' : '周计划已提交（本机）', 'ok');
+          refreshPlanPanel();
+          notifySync();
+        }).catch(function (err) { toast('提交失败：' + err.message, 'err'); });
+      });
+    }
+
+    // 倒计时实时刷新
+    clearInterval(window.__plTimer);
+    if (cur && planStatus(cur) === 'pending') {
+      window.__plTimer = setInterval(function () {
+        const el = document.getElementById('plCountdown');
+        if (el) el.textContent = '剩余 ' + fmtCountdown(cur.deadline);
+        else clearInterval(window.__plTimer);
+      }, 1000);
+    }
+  }
+
   /* 内联编辑 */
   function startEdit(id, p) {
     editingId = id;
@@ -644,6 +730,7 @@
     setupSettings();
     refreshManageList();
     refreshMsgList();
+    refreshPlanPanel();
   }
 
   /* 关键按钮用事件委托，即使初始化某步出错也能响应 */
