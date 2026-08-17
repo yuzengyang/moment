@@ -1,8 +1,20 @@
 {
   "version": 1,
-  "updated": "2026-08-17T06:48:02.925Z",
+  "updated": "2026-08-17T06:51:40.332Z",
   "updatedBy": "wenlinshu",
   "photos": [
+    {
+      "id": "20260817-145132-88s",
+      "file": "photos/20260817-145132-88s.jpg",
+      "location": "武汉",
+      "date": "2026-08-14",
+      "caption": "可能是五行缺肉了，看到相册里的美食走不动道。最近天天吃冰淇淋，好像身体缺铁就会嗜冰呢（给自己贪吃找点借口），等洋洋子来带我吃漏！",
+      "author": "wenlinshu",
+      "tags": [],
+      "category": "food",
+      "visibility": "public",
+      "created": "2026-08-17T06:51:32.971Z"
+    },
     {
       "id": "20260817-144752-iq2",
       "file": "photos/20260817-144752-iq2.jpg",
