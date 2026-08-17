@@ -1,8 +1,20 @@
 {
   "version": 1,
-  "updated": "2026-08-17T06:42:49.205Z",
+  "updated": "2026-08-17T06:44:48.983Z",
   "updatedBy": "wenlinshu",
   "photos": [
+    {
+      "id": "20260817-144442-np2",
+      "file": "photos/20260817-144442-np2.jpg",
+      "location": "武汉",
+      "date": "2026-07-15",
+      "caption": "黑皮辣妹洋洋子，我可以做你的粉丝咩！",
+      "author": "wenlinshu",
+      "tags": [],
+      "category": "us",
+      "visibility": "public",
+      "created": "2026-08-17T06:44:42.285Z"
+    },
     {
       "id": "20260817-144242-vjv",
       "file": "photos/20260817-144242-vjv.jpg",
