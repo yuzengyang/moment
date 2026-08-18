@@ -26,9 +26,9 @@
   modalImg.addEventListener('error', function () {
     const cur = modalImg.src;
     const m1 = cur.match(/raw\.githubusercontent\.com\/([^/]+)\/([^/]+)\/main\/(.+)/);
-    if (m1) { modalImg.src = 'https://cdn.jsdelivr.net/gh/' + m1[1] + '/' + m1[2] + '@main/' + m1[3]; return; }
-    const m2 = cur.match(/cdn\.jsdelivr\.net\/gh\/([^/]+)\/([^@]+)@main\/(.+)/);
-    if (m2) { modalImg.src = 'https://' + m2[1] + '.github.io/' + m2[2] + '/' + m2[3]; return; }
+    if (m1) { modalImg.src = 'https://' + m1[1] + '.github.io/' + m1[2] + '/' + m1[3]; return; }
+    const m2 = cur.match(/https:\/\/([^/]+)\.github\.io\/([^/]+)\/(.+)/);
+    if (m2) { modalImg.src = 'https://cdn.jsdelivr.net/gh/' + m2[1] + '/' + m2[2] + '@main/' + m2[3]; return; }
     if (cur.indexOf('blob:') !== 0) modalImg.src = PLACEHOLDER;
   });
 
@@ -182,6 +182,8 @@
           '<span class="cmt-time">' + esc(fmtDateOnly(c.time)) + '</span>';
         list.appendChild(item);
       });
+    }).catch(function () {
+      list.innerHTML = '<p class="cmt-empty">评论加载失败，请刷新重试</p>';
     });
     form.style.display = lsGet(TOKEN_KEY) ? '' : 'none';
   }
@@ -198,14 +200,16 @@
   function fallbackImg(img) {
     const cur = img.src;
     if (cur.indexOf('raw.githubusercontent.com') > -1) {
+      // raw 失败 → Pages 静态（约1-2分钟更新）
       const m = cur.match(/raw\.githubusercontent\.com\/([^/]+)\/([^/]+)\/main\/(.+)/);
-      if (m) img.src = 'https://cdn.jsdelivr.net/gh/' + m[1] + '/' + m[2] + '@main/' + m[3];
-      else { img.src = PLACEHOLDER; img.classList.add('loaded'); }
-    } else if (cur.indexOf('cdn.jsdelivr.net') > -1) {
-      const m = cur.match(/cdn\.jsdelivr\.net\/gh\/([^/]+)\/([^@]+)@main\/(.+)/);
       if (m) img.src = 'https://' + m[1] + '.github.io/' + m[2] + '/' + m[3];
       else { img.src = PLACEHOLDER; img.classList.add('loaded'); }
     } else if (cur.indexOf('github.io') > -1) {
+      // Pages 失败 → jsDelivr（缓存最长12h）
+      const m = cur.match(/https:\/\/([^/]+)\.github\.io\/([^/]+)\/(.+)/);
+      if (m) img.src = 'https://cdn.jsdelivr.net/gh/' + m[1] + '/' + m[2] + '@main/' + m[3];
+      else { img.src = PLACEHOLDER; img.classList.add('loaded'); }
+    } else if (cur.indexOf('cdn.jsdelivr.net') > -1) {
       img.src = PLACEHOLDER;
       img.classList.add('loaded');
     } else if (cur.indexOf('blob:') !== 0) {
