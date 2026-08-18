@@ -207,10 +207,11 @@ async function loadGithubPhotosAnon() {
 
 /* 通用多渠道读取 GitHub 上的 JSON（raw → jsDelivr → Pages → API） */
 async function fetchGithubJson(relPath) {
+  // 顺序：raw(实时) → Pages(约1-2分钟更新) → jsDelivr(缓存最长12h) → API
   const urls = [
     photoRawUrl(relPath),
-    photoJsUrl(relPath),
-    photoPagesUrl(relPath)
+    photoPagesUrl(relPath),
+    photoJsUrl(relPath)
   ];
   for (let i = 0; i < urls.length; i++) {
     const ctrl = new AbortController();
@@ -693,8 +694,8 @@ async function addComment(photoId, content, author) {
     await ghPutFile('comments.json', JSON.stringify(updated, null, 2), '照片评论 ' + c.id);
     return { comment: c, synced: true };
   }
-  lsSet(LOCAL_CMT_KEY, JSON.stringify([c].concat(localComments())));
-  return { comment: c, synced: false };
+  // 无 token 不落本地：评论只存 GitHub，避免清缓存后"消失"
+  throw new Error('需要配置 Token 才能评论');
 }
 
 /* 删除评论 */
