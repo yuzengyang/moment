@@ -1,8 +1,32 @@
 {
   "version": 1,
-  "updated": "2026-08-19T02:55:13.087Z",
+  "updated": "2026-08-19T03:01:23.453Z",
   "updatedBy": "wenlinshu",
   "photos": [
+    {
+      "id": "20260819-110111-wpo",
+      "file": "photos/20260819-110111-wpo.jpg",
+      "location": "窝的小窝",
+      "date": "2026-08-19",
+      "caption": "想和小丑鱼说声对不起，可是我实在是太难受啦，需要酒精助眠，米酒和啤酒对身体的伤害应该没有那么大吧（心虚ing）",
+      "author": "wenlinshu",
+      "tags": [],
+      "category": "us",
+      "visibility": "public",
+      "created": "2026-08-19T03:01:11.783Z"
+    },
+    {
+      "id": "20260819-110111-y1x",
+      "file": "photos/20260819-110111-y1x.jpg",
+      "location": "中南财附近的餐馆",
+      "date": "2026-07-05",
+      "caption": "想念给我疯狂剥虾的小丑鱼，这盘虾得有一半进了我的肚子，真呀真好吃！小丑鱼剥的更加美味！",
+      "author": "wenlinshu",
+      "tags": [],
+      "category": "food",
+      "visibility": "public",
+      "created": "2026-08-19T03:01:16.898Z"
+    },
     {
       "id": "20260819-105506-wl1",
       "file": "photos/20260819-105506-wl1.jpg",
