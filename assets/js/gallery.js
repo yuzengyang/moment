@@ -5,7 +5,7 @@
 
   let photos = [];
   let currentIndex = -1;
-  const SHOW_INITIAL = 12;   // 主页默认展示最新 12 张
+  const SHOW_INITIAL = 12;   // 主页默认展示最新 12 组
   let expanded = false;      // 是否展开全部
   let filterCategory = 'all'; // 分类筛选：all | scenery | food | us
   let currentList = [];        // 当前实际展示的照片列表（含分类筛选）
@@ -86,18 +86,19 @@
       ? photos
       : photos.filter(function (p) { return p.category === filterCategory; });
     countEl.innerHTML = '<b>' + filtered.length + '</b> 段时光';
-    const visible = expanded ? filtered : filtered.slice(0, SHOW_INITIAL);
-    currentList = visible;
-    // 按组渲染：同 groupId 的照片合并为一张卡片
-    const groups = [];
+    // 按组渲染：同 groupId 的照片合并为一张卡片；默认展示 12 组
+    const allGroups = [];
     const gmap = {};
-    visible.forEach(function (p) {
+    filtered.forEach(function (p) {
       const gid = p.groupId || p.id;
-      if (!gmap[gid]) { gmap[gid] = []; groups.push(gmap[gid]); }
+      if (!gmap[gid]) { gmap[gid] = []; allGroups.push(gmap[gid]); }
       gmap[gid].push(p);
     });
+    const shownGroups = expanded ? allGroups : allGroups.slice(0, SHOW_INITIAL);
+    currentList = [];
+    shownGroups.forEach(function (g) { currentList = currentList.concat(g); });
     let flatIdx = 0;
-    groups.forEach(function (group) {
+    shownGroups.forEach(function (group) {
       buildCard(group[0], flatIdx, group.length);
       flatIdx += group.length;
     });
@@ -105,7 +106,7 @@
 
     const moreWrap = document.getElementById('moreWrap');
     const moreBtn = document.getElementById('moreBtn');
-    const shownTotal = filterCategory === 'all' ? photos.length : filtered.length;
+    const shownTotal = allGroups.length;
     if (shownTotal > SHOW_INITIAL && moreWrap) {
       moreWrap.style.display = 'block';
       moreBtn.innerHTML = expanded ? '收起 <span class="m-arrow">▴</span>' : '更多 <span class="m-arrow">▾</span>';
