@@ -72,6 +72,12 @@
   .masonry { grid-template-columns: 1fr; }
 }
 .photo-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.grp-badge {
+  position: absolute; right: 10px; top: 10px; z-index: 2;
+  padding: 3px 10px; border-radius: 999px; font-size: 0.74rem;
+  background: rgba(242, 118, 126, 0.92); color: #fff; font-weight: 500;
+  box-shadow: 0 4px 10px rgba(120, 50, 40, 0.25);
+}
 .photo-card .thumb {
   position: relative; overflow: hidden; aspect-ratio: 3 / 4;
   background: linear-gradient(110deg, #F6E6DA 30%, #FDF1E7 50%, #F6E6DA 70%);
