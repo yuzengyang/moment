@@ -722,6 +722,7 @@
           '<span class="cat-opt' + (p.category === 'scenery' ? ' active' : '') + '" data-cat="scenery" style="cursor:pointer">美景</span>' +
           '<span class="cat-opt' + (p.category === 'food' ? ' active' : '') + '" data-cat="food" style="cursor:pointer">美食</span>' +
           '<span class="cat-opt' + (p.category === 'us' ? ' active' : '') + '" data-cat="us" style="cursor:pointer">我们</span>' +
+          '<span class="cat-opt' + (p.category === 'life' ? ' active' : '') + '" data-cat="life" style="cursor:pointer">生活</span>' +
         '</div></div>' +
         '<div class="field" style="margin:0"><label>想说的话</label><textarea class="input textarea e-cap">' + esc(p.caption || '') + '</textarea></div>' +
         '<div style="display:flex;gap:8px;justify-content:flex-end">' +
