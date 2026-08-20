@@ -17,8 +17,7 @@
     uploadList: document.getElementById('uploadList'),
     uploadBtn: document.getElementById('uploadBtn'),
     uploadHint: document.getElementById('uploadHint'),
-    bulkLoc: document.getElementById('bulkLoc'),
-    bulkLocBtn: document.getElementById('bulkLocBtn'),
+    grpFields: document.getElementById('grpFields'),
     manageList: document.getElementById('manageList'),
     manageCount: document.getElementById('manageCount'),
     // 设置
@@ -138,17 +137,45 @@
     });
   }
 
-  function setupBulkLoc() {
-    els.bulkLocBtn.addEventListener('click', function () {
-      const v = els.bulkLoc.value.trim();
-      if (!v) { toast('先填写统一地点', 'err'); return; }
-      els.uploadList.querySelectorAll('.up-loc').forEach(function (inp) { inp.value = v; });
-      toast('已应用到全部照片', 'ok');
+  /* 组式上传：一次多张照片共享一组字段 */
+  function renderGroupFields() {
+    const today = new Date();
+    const iso = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+    els.grpFields.innerHTML =
+      '<div class="grp-note">💡 一次上传最多 4 张，同一地点、同一段描述</div>' +
+      '<div class="up-row">' +
+        '<div class="field" style="margin:0"><label>地点</label><input class="input grp-loc" placeholder="例如：成都 · 玉林路"></div>' +
+        '<div class="field" style="margin:0"><label>日期</label><input class="input grp-date" type="date" value="' + iso + '"></div>' +
+      '</div>' +
+      '<div class="field" style="margin:0"><label>想说的话</label><textarea class="input textarea grp-cap" placeholder="这家店的面很香，下次还要一起来。"></textarea></div>' +
+      '<div class="field" style="margin:0"><label>种类</label><div class="cat-toggle grp-cats">' +
+        CATEGORIES.map(function (c) {
+          return '<span class="cat-opt" data-cat="' + c.key + '" style="cursor:pointer">' + c.name + '</span>';
+        }).join('') +
+      '</div></div>' +
+      '<div class="field" style="margin:0"><label>可见性</label>' +
+        '<select class="select grp-vis">' +
+          '<option value="public" selected>公开（展览页展示）</option>' +
+          '<option value="private">仅我可见</option>' +
+        '</select>' +
+      '</div>';
+
+    els.grpFields.querySelectorAll('.cat-opt').forEach(function (opt) {
+      opt.addEventListener('click', function () {
+        els.grpFields.querySelectorAll('.cat-opt').forEach(function (o) { o.classList.remove('active'); });
+        opt.classList.add('active');
+      });
     });
   }
 
   function addFiles(files) {
     if (!files.length) return;
+    const remain = 4 - pendingItems.length;
+    if (files.length > remain) {
+      toast('一次最多上传 4 张，超出部分已忽略', 'err');
+      files = files.slice(0, remain);
+      if (!files.length) return;
+    }
     files.forEach(function (f) {
       pendingItems.push({ file: f, dataUrl: null, status: 'processing', error: '', exifDate: null });
     });
@@ -156,21 +183,12 @@
     updateUploadBtnState();
     processPending();
 
-    // 异步读取每张照片的 EXIF 拍摄日期，回填到日期输入框
-    pendingItems.forEach(function (item, idx) {
-      readExifDate(item.file).then(function (d) {
-        if (!d || pendingItems[idx] !== item) return;
-        item.exifDate = d;
-        const rows = els.uploadList.querySelectorAll('.upload-item');
-        for (let r = 0; r < rows.length; r++) {
-          if (Number(rows[r].dataset.i) === idx) {
-            const inp = rows[r].querySelector('.up-date');
-            if (inp) inp.value = d;
-            break;
-          }
-        }
+    // 异步读取第一张照片的 EXIF 拍摄日期，回填到组日期
+    if (!els.grpFields.querySelector('.grp-date').value) {
+      readExifDate(files[0].file).then(function (d) {
+        if (d) els.grpFields.querySelector('.grp-date').value = d;
       });
-    });
+    }
   }
 
   function removeFileAt(i) {
@@ -227,69 +245,47 @@
 
     pendingItems.forEach(function (item, i) {
       const el = document.createElement('div');
-      el.className = 'upload-item';
+      el.className = 'upload-item upload-thumb-only';
       el.dataset.i = i;
 
       const url = URL.createObjectURL(item.file);
-      const today = new Date();
-      const iso = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
-
       const statusHtml = item.status === 'processing'
         ? '<span class="up-status processing">处理中…</span>'
         : item.status === 'error'
           ? '<span class="up-status error">处理失败：' + esc(item.error) + '</span>'
-          : '<span class="up-status ready">✓ 已就绪，可以上传</span>';
+          : '<span class="up-status ready">✓ 已就绪</span>';
 
       el.innerHTML =
         '<div class="up-thumb"><img src="' + url + '" alt="预览"></div>' +
-        '<div class="up-fields">' +
-          statusHtml +
-          '<div class="up-row">' +
-            '<div class="field" style="margin:0"><label>地点</label><input class="input up-loc" placeholder="例如：成都 · 玉林路" value=""></div>' +
-            '<div class="field" style="margin:0"><label>日期</label><input class="input up-date" type="date" value="' + iso + '"></div>' +
-          '</div>' +
-          '<div class="field" style="margin:0"><label>想说的话</label><textarea class="input textarea up-cap" placeholder="这家店的面很香，下次还要一起来。"></textarea></div>' +
-          '<div class="field" style="margin:0"><label>种类</label><div class="cat-toggle">' +
-            CATEGORIES.map(function (c) {
-              return '<span class="cat-opt" data-cat="' + c.key + '" style="cursor:pointer">' + c.name + '</span>';
-            }).join('') +
-          '</div></div>' +
-          '<div class="field" style="margin:0"><label>可见性</label>' +
-            '<select class="select up-vis">' +
-              '<option value="public" selected>公开（展览页展示）</option>' +
-              '<option value="private">仅我可见</option>' +
-            '</select>' +
-          '</div>' +
+        '<div class="up-fields">' + statusHtml +
           '<div style="text-align:right"><button class="btn btn-ghost btn-sm up-remove" type="button">移除</button></div>' +
         '</div>';
 
       el.querySelector('.up-remove').addEventListener('click', function () { removeFileAt(i); });
-      el.querySelectorAll('.cat-opt').forEach(function (opt) {
-        opt.addEventListener('click', function () {
-          el.querySelectorAll('.cat-opt').forEach(function (o) { o.classList.remove('active'); });
-          opt.classList.add('active');
-        });
-      });
       els.uploadList.appendChild(el);
     });
   }
 
   function collectEntries() {
     const entries = [];
-    const items = els.uploadList.querySelectorAll('.upload-item');
-    items.forEach(function (item) {
-      const idx = Number(item.dataset.i);
-      const p = pendingItems[idx];
-      if (!p || p.status !== 'ready' || !p.dataUrl) return;
-      const catEl = item.querySelector('.cat-opt.active');
+    const loc = els.grpFields.querySelector('.grp-loc').value.trim();
+    const date = els.grpFields.querySelector('.grp-date').value;
+    const cap = els.grpFields.querySelector('.grp-cap').value.trim();
+    const catEl = els.grpFields.querySelector('.cat-opt.active');
+    const vis = els.grpFields.querySelector('.grp-vis').value;
+    const gid = genId();
+
+    pendingItems.forEach(function (p) {
+      if (p.status !== 'ready' || !p.dataUrl) return;
       entries.push({
         dataUrl: p.dataUrl,
-        location: item.querySelector('.up-loc').value.trim(),
-        date: item.querySelector('.up-date').value,
-        caption: item.querySelector('textarea.up-cap').value.trim(),
+        location: loc,
+        date: date,
+        caption: cap,
         tags: [],
         category: catEl ? catEl.dataset.cat : '',
-        visibility: item.querySelector('.up-vis').value,
+        visibility: vis,
+        groupId: gid,
         author: currentUser
       });
     });
@@ -319,6 +315,7 @@
           tags: e.tags,
           category: e.category,
           visibility: e.visibility,
+          groupId: e.groupId,
           author: e.author
         };
       });
@@ -858,7 +855,7 @@
     if (!guard()) return;
     refreshModeBar();
     setupDropzone();
-    setupBulkLoc();
+    renderGroupFields();
     setupSettings();
     refreshManageList();
     refreshMsgList();
