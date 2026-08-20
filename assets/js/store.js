@@ -337,6 +337,7 @@ async function uploadPhotos(entries, onProgress) {
         tags: e.tags || [],
         category: e.category || '',
         visibility: e.visibility || 'public',
+        groupId: e.groupId || '',
         created: new Date().toISOString()
       };
       try {
@@ -383,6 +384,7 @@ async function uploadPhotos(entries, onProgress) {
       tags: e.tags || [],
       category: e.category || '',
       visibility: e.visibility || 'public',
+      groupId: e.groupId || '',
       created: new Date().toISOString()
     });
     if (onProgress) onProgress(i + 1, entries.length);
