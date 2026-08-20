@@ -15,7 +15,8 @@ const COMPANIONS = [
 const CATEGORIES = [
   { key: 'scenery', name: '美景', color: '#7FA36B' },
   { key: 'food', name: '美食', color: '#E06A5E' },
-  { key: 'us', name: '我们', color: '#5B8DB8' }
+  { key: 'us', name: '我们', color: '#5B8DB8' },
+  { key: 'life', name: '生活', color: '#E8A34B' }
 ];
 
 function categoryName(key) {
