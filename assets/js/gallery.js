@@ -46,7 +46,7 @@
 
   /* ---------- 渲染 ---------- */
 
-  function buildCard(p, idx) {
+  function buildCard(p, idx, groupCount) {
     const card = document.createElement('article');
     card.className = 'photo-card reveal';
     card.dataset.idx = idx;
@@ -56,10 +56,11 @@
       : '<span class="loc-chip" style="opacity:.75">' + svgPin() + '地点待补充</span>';
     const capHtml = p.caption ? '<p class="cap">' + esc(p.caption) + '</p>' : '<p class="cap" style="opacity:.5">没有留下文字</p>';
 
+    const groupBadge = groupCount > 1 ? '<span class="grp-badge">共 ' + groupCount + ' 张</span>' : '';
     card.innerHTML =
       '<div class="thumb">' +
         '<img data-src="' + esc(p.url || '') + '" alt="' + esc(p.location || '照片') + '" loading="lazy">' +
-        locHtml +
+        locHtml + groupBadge +
       '</div>' +
       '<div class="meta">' + capHtml +
         '<div class="row">' +
@@ -87,7 +88,19 @@
     countEl.innerHTML = '<b>' + filtered.length + '</b> 段时光';
     const visible = expanded ? filtered : filtered.slice(0, SHOW_INITIAL);
     currentList = visible;
-    visible.forEach(function (p, idx) { buildCard(p, idx); });
+    // 按组渲染：同 groupId 的照片合并为一张卡片
+    const groups = [];
+    const gmap = {};
+    visible.forEach(function (p) {
+      const gid = p.groupId || p.id;
+      if (!gmap[gid]) { gmap[gid] = []; groups.push(gmap[gid]); }
+      gmap[gid].push(p);
+    });
+    let flatIdx = 0;
+    groups.forEach(function (group) {
+      buildCard(group[0], flatIdx, group.length);
+      flatIdx += group.length;
+    });
     lazyLoad();
 
     const moreWrap = document.getElementById('moreWrap');
