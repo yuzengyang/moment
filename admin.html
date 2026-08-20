@@ -52,14 +52,11 @@
       </div>
       <div class="dropzone" id="dropzone">
         <div class="dz-icon">🖼️</div>
-        <div class="dz-main">点击选择照片，或拖拽到此处</div>
-        <div class="dz-sub">JPG / PNG / WebP，手机原图即可，会自动压缩</div>
+        <div class="dz-main">点击选择照片，或拖拽到此处（一次最多 4 张）</div>
+        <div class="dz-sub">同一地点、同一段描述的多张照片，可以一次上传</div>
       </div>
       <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
-      <div class="bulk-loc">
-        <input class="input" id="bulkLoc" placeholder="统一地点（选填）：例如 成都 · 玉林路">
-        <button class="btn btn-ghost btn-sm" id="bulkLocBtn" type="button">应用到全部</button>
-      </div>
+      <div class="grp-fields" id="grpFields"></div>
       <div class="upload-list" id="uploadList"></div>
       <div class="progress-wrap" id="progressWrap" style="display:none">
         <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
