@@ -119,6 +119,7 @@ input, textarea, select { font-family: inherit; font-size: 1rem; color: var(--in
 .cat-badge[data-cat="scenery"] { background: #EAF2E4; color: #5E8250; }
 .cat-badge[data-cat="food"] { background: #FDEAE6; color: #C0564C; }
 .cat-badge[data-cat="us"] { background: #E6F0F7; color: #4A7DA6; }
+.cat-badge[data-cat="life"] { background: #FBF0E0; color: #B0742B; }
 
 /* ---------- 留言头像 ---------- */
 .gb-avatar {
