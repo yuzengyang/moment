@@ -56,9 +56,14 @@
 
 /* ---------- 瀑布流 ---------- */
 .masonry {
-  max-width: 1180px; margin: 18px auto 0; padding: 0 24px;
+  max-width: 1180px; margin: 18px auto 0; padding: 0 24px 8px;
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+  max-height: 680px; overflow-y: auto;
+  scrollbar-width: thin; scrollbar-color: #E8CFC0 transparent;
 }
+.masonry::-webkit-scrollbar { width: 8px; }
+.masonry::-webkit-scrollbar-thumb { background: #E8CFC0; border-radius: 99px; }
+.masonry::-webkit-scrollbar-track { background: transparent; }
 .photo-card {
   border-radius: var(--radius);
   background: var(--card); box-shadow: var(--shadow); overflow: hidden;
