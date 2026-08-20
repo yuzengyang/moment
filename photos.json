@@ -1,8 +1,47 @@
 {
   "version": 1,
-  "updated": "2026-08-20T10:03:54.490Z",
-  "updatedBy": "wenlinshu",
+  "updated": "2026-08-20T15:30:38.357Z",
+  "updatedBy": "yuzengyang",
   "photos": [
+    {
+      "id": "20260820-233018-k3f",
+      "file": "photos/20260820-233018-k3f.jpg",
+      "location": "宜昌",
+      "date": "2026-05-11",
+      "caption": "我们一起举牌牌、吃吃吃！",
+      "author": "yuzengyang",
+      "tags": [],
+      "category": "us",
+      "visibility": "public",
+      "groupId": "20260820-233018-pyr",
+      "created": "2026-08-20T15:30:18.526Z"
+    },
+    {
+      "id": "20260820-233018-fzj",
+      "file": "photos/20260820-233018-fzj.jpg",
+      "location": "宜昌",
+      "date": "2026-05-11",
+      "caption": "我们一起举牌牌、吃吃吃！",
+      "author": "yuzengyang",
+      "tags": [],
+      "category": "us",
+      "visibility": "public",
+      "groupId": "20260820-233018-pyr",
+      "created": "2026-08-20T15:30:26.323Z"
+    },
+    {
+      "id": "20260820-233018-pp2",
+      "file": "photos/20260820-233018-pp2.jpg",
+      "location": "宜昌",
+      "date": "2026-05-11",
+      "caption": "我们一起举牌牌、吃吃吃！",
+      "author": "yuzengyang",
+      "tags": [],
+      "category": "us",
+      "visibility": "public",
+      "groupId": "20260820-233018-pyr",
+      "created": "2026-08-20T15:30:31.582Z"
+    },
     {
       "id": "20260820-180344-rqw",
       "file": "photos/20260820-180344-rqw.jpg",
