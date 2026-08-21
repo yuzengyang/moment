@@ -1,8 +1,21 @@
 {
   "version": 1,
-  "updated": "2026-08-21T12:12:51.167Z",
+  "updated": "2026-08-21T12:14:45.970Z",
   "updatedBy": "wenlinshu",
   "photos": [
+    {
+      "id": "20260821-201439-lpk",
+      "file": "photos/20260821-201439-lpk.jpg",
+      "location": "街道口子",
+      "date": "2026-08-21",
+      "caption": "都市波谲云诡的傍晚，记录一下～",
+      "author": "wenlinshu",
+      "tags": [],
+      "category": "scenery",
+      "visibility": "public",
+      "groupId": "20260821-201439-6m1",
+      "created": "2026-08-21T12:14:39.763Z"
+    },
     {
       "id": "20260821-201239-vlc",
       "file": "photos/20260821-201239-vlc.jpg",
