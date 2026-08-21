@@ -1,8 +1,34 @@
 {
   "version": 1,
-  "updated": "2026-08-21T04:01:49.470Z",
+  "updated": "2026-08-21T12:12:51.167Z",
   "updatedBy": "wenlinshu",
   "photos": [
+    {
+      "id": "20260821-201239-vlc",
+      "file": "photos/20260821-201239-vlc.jpg",
+      "location": "窝的小窝",
+      "date": "2026-08-21",
+      "caption": "小温牌冷面，酸酸甜甜，值得拥有，谁不想在炎炎夏日急头白脸地来一碗牛漏冷面捏！",
+      "author": "wenlinshu",
+      "tags": [],
+      "category": "food",
+      "visibility": "public",
+      "groupId": "20260821-201239-m2x",
+      "created": "2026-08-21T12:12:39.686Z"
+    },
+    {
+      "id": "20260821-201239-kz8",
+      "file": "photos/20260821-201239-kz8.jpg",
+      "location": "窝的小窝",
+      "date": "2026-08-21",
+      "caption": "小温牌冷面，酸酸甜甜，值得拥有，谁不想在炎炎夏日急头白脸地来一碗牛漏冷面捏！",
+      "author": "wenlinshu",
+      "tags": [],
+      "category": "food",
+      "visibility": "public",
+      "groupId": "20260821-201239-m2x",
+      "created": "2026-08-21T12:12:44.705Z"
+    },
     {
       "id": "20260821-120131-9qb",
       "file": "photos/20260821-120131-9qb.jpg",
