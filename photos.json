@@ -1,8 +1,60 @@
 {
   "version": 1,
-  "updated": "2026-08-20T15:33:47.440Z",
-  "updatedBy": "yuzengyang",
+  "updated": "2026-08-21T03:56:33.574Z",
+  "updatedBy": "wenlinshu",
   "photos": [
+    {
+      "id": "20260821-115612-5en",
+      "file": "photos/20260821-115612-5en.jpg",
+      "location": "宿舍观景台",
+      "date": "2026-08-20",
+      "caption": "我的宿舍真的太棒啦，绝佳日落打卡位，住到就是赚到哦！这座云山很美，想爬上去玩😍（再放几张之前拍的试用一下网站新功能）",
+      "author": "wenlinshu",
+      "tags": [],
+      "category": "life",
+      "visibility": "public",
+      "groupId": "20260821-115612-upz",
+      "created": "2026-08-21T03:56:12.231Z"
+    },
+    {
+      "id": "20260821-115612-psn",
+      "file": "photos/20260821-115612-psn.jpg",
+      "location": "宿舍观景台",
+      "date": "2026-08-20",
+      "caption": "我的宿舍真的太棒啦，绝佳日落打卡位，住到就是赚到哦！这座云山很美，想爬上去玩😍（再放几张之前拍的试用一下网站新功能）",
+      "author": "wenlinshu",
+      "tags": [],
+      "category": "life",
+      "visibility": "public",
+      "groupId": "20260821-115612-upz",
+      "created": "2026-08-21T03:56:17.165Z"
+    },
+    {
+      "id": "20260821-115612-evj",
+      "file": "photos/20260821-115612-evj.jpg",
+      "location": "宿舍观景台",
+      "date": "2026-08-20",
+      "caption": "我的宿舍真的太棒啦，绝佳日落打卡位，住到就是赚到哦！这座云山很美，想爬上去玩😍（再放几张之前拍的试用一下网站新功能）",
+      "author": "wenlinshu",
+      "tags": [],
+      "category": "life",
+      "visibility": "public",
+      "groupId": "20260821-115612-upz",
+      "created": "2026-08-21T03:56:23.260Z"
+    },
+    {
+      "id": "20260821-115612-w87",
+      "file": "photos/20260821-115612-w87.jpg",
+      "location": "宿舍观景台",
+      "date": "2026-08-20",
+      "caption": "我的宿舍真的太棒啦，绝佳日落打卡位，住到就是赚到哦！这座云山很美，想爬上去玩😍（再放几张之前拍的试用一下网站新功能）",
+      "author": "wenlinshu",
+      "tags": [],
+      "category": "life",
+      "visibility": "public",
+      "groupId": "20260821-115612-upz",
+      "created": "2026-08-21T03:56:27.744Z"
+    },
     {
       "id": "20260820-233319-w8t",
       "file": "photos/20260820-233319-w8t.jpg",
