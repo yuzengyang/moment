@@ -1,8 +1,34 @@
 {
   "version": 1,
-  "updated": "2026-08-23T09:33:38.513Z",
+  "updated": "2026-08-24T07:46:49.903Z",
   "updatedBy": "wenlinshu",
   "photos": [
+    {
+      "id": "20260824-154636-6ha",
+      "file": "photos/20260824-154636-6ha.jpg",
+      "location": "武汉",
+      "date": "2026-07-15",
+      "caption": "怀念citywalk的一天，好吃的云南菜和舒芙蕾和甜品，当时为嘛那么富有！",
+      "author": "wenlinshu",
+      "tags": [],
+      "category": "food",
+      "visibility": "public",
+      "groupId": "20260824-154636-oi7",
+      "created": "2026-08-24T07:46:36.232Z"
+    },
+    {
+      "id": "20260824-154636-h8p",
+      "file": "photos/20260824-154636-h8p.jpg",
+      "location": "武汉",
+      "date": "2026-07-15",
+      "caption": "怀念citywalk的一天，好吃的云南菜和舒芙蕾和甜品，当时为嘛那么富有！",
+      "author": "wenlinshu",
+      "tags": [],
+      "category": "food",
+      "visibility": "public",
+      "groupId": "20260824-154636-oi7",
+      "created": "2026-08-24T07:46:42.436Z"
+    },
     {
       "id": "20260823-172603-igy",
       "file": "photos/20260823-172603-igy.jpg",
