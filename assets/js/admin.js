@@ -540,6 +540,9 @@
         html += '<div class="pl-result ' + (pass ? 'pass' : 'fail') + '">' + cur.score + ' 分 · ' + (pass ? '合格 ✓' : '不合格') + '（' + esc(authorName(cur.scoredBy)) + ' 评）</div>';
       } else {
         html += '<div class="pl-result fail">已过期 · 未评分</div>';
+        html += '<div class="pl-score-box"><label>补评分（60 分以上合格）</label><div class="pl-score-row">' +
+          '<input class="input pl-score" type="number" min="0" max="100" placeholder="打分 0-100">' +
+          '<button class="btn btn-primary btn-sm pl-score-btn">提交评分</button></div></div>';
       }
 
       // 编辑 + 删除（两人均可）
