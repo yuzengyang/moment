@@ -502,13 +502,19 @@ async function addMessage(name, content) {
       throw new Error('留言提交失败（' + res.status + '）');
     } catch (e) {
       clearTimeout(timer);
-      throw new Error(e.name === 'AbortError' ? '留言提交超时，请重试' : e.message);
+      // 中转不可达（如 workers.dev 被网络拦截 / 超时）时退回本机保存，
+      // 不丢留言，也不把整次留言判为失败
+      lsSet(LOCAL_MSG_KEY, JSON.stringify([msg].concat(localMessages())));
+      const reason = e.name === 'AbortError'
+        ? '留言服务连接超时'
+        : (/^留言/.test(e.message || '') ? e.message : '留言服务暂时连不上');
+      return { msg: msg, synced: false, reason: reason };
     }
   }
 
   // 兜底：未配置中转时存本地
   lsSet(LOCAL_MSG_KEY, JSON.stringify([msg].concat(localMessages())));
-  return { msg: msg, synced: false };
+  return { msg: msg, synced: false, reason: '未配置留言中转服务' };
 }
 
 /* 删除留言：有 token 删 GitHub，无 token 删本地 */
@@ -650,6 +656,16 @@ async function deletePlan(id) {
 /* ============ 照片评论 ============ */
 
 const LOCAL_CMT_KEY = 'om_comments_local';
+const COMMENT_KEY_STORAGE = 'om_comment_key';
+
+/* 评论权限：有 GitHub Token（站主）或有评论口令（两人各自的设备） */
+function getCommentKey() { return lsGet(COMMENT_KEY_STORAGE) || ''; }
+function setCommentKey(k) {
+  const v = String(k || '').trim();
+  if (v) lsSet(COMMENT_KEY_STORAGE, v);
+  else lsDel(COMMENT_KEY_STORAGE);
+}
+function canWriteComments() { return !!lsGet(TOKEN_KEY) || !!getCommentKey(); }
 
 function localComments() {
   try { return JSON.parse(lsGet(LOCAL_CMT_KEY) || '[]'); } catch (e) { return []; }
@@ -677,7 +693,7 @@ async function loadComments(photoId) {
   return all.filter(function (c) { return c.photoId === photoId; });
 }
 
-/* 新增评论（仅持有 Token 者，即站主本人） */
+/* 新增评论：有 Token 直接写 GitHub；没有 Token 但有评论口令，走 Worker 中转 */
 async function addComment(photoId, content, author) {
   const c = {
     id: genId() + '-c',
@@ -696,11 +712,35 @@ async function addComment(photoId, content, author) {
     await ghPutFile('comments.json', JSON.stringify(updated, null, 2), '照片评论 ' + c.id);
     return { comment: c, synced: true };
   }
-  // 无 token 不落本地：评论只存 GitHub，避免清缓存后"消失"
-  throw new Error('需要配置 Token 才能评论');
+
+  const key = getCommentKey();
+  if (key) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(function () { ctrl.abort(); }, 20000);
+    let res;
+    try {
+      res = await fetch(GUESTBOOK_API + '/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Comment-Key': key },
+        body: JSON.stringify({ photoId: photoId, content: content, author: c.author }),
+        signal: ctrl.signal
+      });
+    } catch (e) {
+      clearTimeout(timer);
+      throw new Error(e.name === 'AbortError' ? '评论服务连接超时，请重试' : '连不上评论服务，请检查网络或代理');
+    }
+    clearTimeout(timer);
+    const data = await res.json().catch(function () { return null; });
+    if (res.status === 401) throw new Error('评论口令不对，请在评论框上方重新输入');
+    if (!res.ok) throw new Error((data && data.error) || ('评论服务返回 ' + res.status));
+    return { comment: (data && data.comment) || c, synced: true };
+  }
+
+  // 无 Token 也无口令：不落本地，避免清缓存后「消失」
+  throw new Error('这台设备还没有评论权限（需要评论口令或 Token）');
 }
 
-/* 删除评论 */
+/* 删除评论：有 Token 写 GitHub；有口令走 Worker；都没有只删本机副本 */
 async function deleteComment(id) {
   if (lsGet(TOKEN_KEY)) {
     let existing = [];
@@ -710,8 +750,21 @@ async function deleteComment(id) {
     } catch (e) { return false; }
     const rest = existing.filter(function (c) { return c.id !== id; });
     await ghPutFile('comments.json', JSON.stringify({ version: 1, comments: rest }, null, 2), '删除照片评论 ' + id);
-  } else {
-    lsSet(LOCAL_CMT_KEY, JSON.stringify(localComments().filter(function (c) { return c.id !== id; })));
+    return true;
   }
+
+  const key = getCommentKey();
+  if (key) {
+    const res = await fetch(GUESTBOOK_API + '/comments/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Comment-Key': key },
+      body: JSON.stringify({ id: id })
+    });
+    const data = await res.json().catch(function () { return null; });
+    if (!res.ok) throw new Error((data && data.error) || ('删除失败 ' + res.status));
+    return true;
+  }
+
+  lsSet(LOCAL_CMT_KEY, JSON.stringify(localComments().filter(function (c) { return c.id !== id; })));
   return true;
 }

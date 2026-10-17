@@ -2,7 +2,7 @@
 
 温琳舒 ♥ 于增洋 的日常照片展览站：美食与风景的滚动画廊，支持登录后上传、编辑、删除照片。
 
-- 展览页 `index.html`：一行 4 张照片墙（美景/美食/我们 分类筛选），默认最新 12 张 +「更多」；点击看详情（含照片评论区）；周计划黑板（倒计时+评分结果）；开放留言板；页脚更新日期；回到顶部
+- 展览页 `index.html`：一行 4 张照片墙（美景/美食/我们/生活 分类筛选），默认最新 12 张 +「更多」；点击看详情（含照片评论区）；周计划黑板（倒计时+评分结果）；开放留言板；页脚更新日期；回到顶部
 - 登录页 `login.html`：账号 `wenlinshu`（密码 `yyyuzengyang`）/ `yuzengyang`（密码 `wwwenlinshu`），封面用真实照片
 - 管理页 `admin.html`：周计划管理（提交/评分/编辑/删除）、上传（自动压缩+进度条+分类+可见性）、已有照片（年份筛选+编辑+删除）、照片评论管理、留言管理、存储设置
 
@@ -28,15 +28,18 @@ wenlinshu 提交周计划（可指定截止日期，默认 7 天后），展示�
 
 ## 照片评论
 
-照片详情弹窗内有评论区：**只有配置了 Token 的浏览器**（站主本人）可发表评论，实时同步；管理页「照片评论」可删除。数据存 `comments.json`。
+照片详情弹窗内有评论区，数据存 `comments.json`，两种方式都能发：
 
-## 留言板
+- **GitHub Token**（站主本人）：浏览器里有 Token 就直接写 GitHub；
+- **评论口令**（两个人各自都能用）：口令存在 Cloudflare Worker 的服务端（环境变量 `COMMENT_KEY`），页面源码里没有。在设备上输入一次，之后长期有效。
 
-展览页底部开放留言板（姓名 + 内容两栏）。留言存 `messages.json`；有 Token 的设备提交即时同步线上，无 Token 设备仅存本地并提示。管理页「留言管理」可删除留言。
+登录过管理页的设备如果没 Token，评论框上方会出现「输入评论口令」的入口；口令只用于评论，不涉及上传和删除照片。管理页「照片评论」删除评论时同样支持口令或 Token。
+
+> Token 过期时管理页顶部会标红「Token 已失效」。Worker 没配置 `COMMENT_KEY` 时评论接口返回 503，输入口令会提示「评论服务还没启用」。
 
 ## 首批照片与页面装饰
 
-`photos/` 中已放入 4 张照片（2026-08-14 一张、2026-08-15 三张），来自 `input/Pictures/`：
+线上 `photos/` 已有 172 张照片（本地 `photos/` 为空，照片只在 GitHub 仓库）。最早的 4 张（2026-08-14 一张、2026-08-15 三张）来自 `input/Pictures/`：
 
 - 展览页 Hero 区用 3 张竖屏照片做成"照片墙"装饰（宝丽来风格，轻微旋转错落）
 - 登录页卡片顶部用方形照片作圆形封面
@@ -47,8 +50,8 @@ wenlinshu 提交周计划（可指定截止日期，默认 7 天后），展示�
 ## 本地预览
 
 ```bash
-cd our-moments
-python -m http.server 8000
+cd /Users/zengyangyu/Deepseek/workspaces/web/projects/our-moments
+python3 -m http.server 8000
 ```
 
 浏览器打开 http://localhost:8000 （上传与浏览需要 http 服务，直接双击 HTML 文件会因浏览器安全策略无法读取数据）。
@@ -57,10 +60,12 @@ python -m http.server 8000
 
 | 模式 | 照片存在哪 | 谁能看到 |
 | --- | --- | --- |
-| 本地演示 | 浏览器 IndexedDB | 仅本机同一浏览器 |
+| 本地演示 | 浏览器 IndexedDB | 仅本机同一浏览器，且只在 GitHub 不可达时才顶上展示 |
 | GitHub 实时 | GitHub 仓库 moment | 任何设备，打开即见最新 |
 
 管理页 → 存储设置 中切换。GitHub 模式需要在设置里粘贴一次 Personal Access Token（Fine-grained，仅 moment 仓库，Contents 读写权限），Token 只保存在你自己的浏览器 localStorage 中，页面不向任何第三方发送。
+
+> 没有 Token 时，管理页会拦住上传（提示先去粘贴 Token），因为此时照片只进本机、展览页和其他设备都看不到。换电脑、清缓存、Token 到期都会回到这个状态，重新粘贴一次即可。
 
 上传成功后，照片立即写入仓库 `photos/` 并更新 `photos.json`；展览页会自动拉取最新数据，无需手动刷新部署。
 
@@ -81,6 +86,9 @@ bash scripts/deploy.sh
 
 脚本会创建仓库、上传全部文件、启用 Pages。
 
+> 脚本会跳过 `photos.json` / `messages.json` / `comments.json` / `plans.json` / `photos/`，
+> 不覆盖线上真实数据。token 只从环境变量读，不要写进脚本或仓库。
+
 ## 目录结构
 
 ```
@@ -88,16 +96,18 @@ our-moments/
 ├── index.html        展览页（瀑布流 + 详情弹窗）
 ├── login.html        登录页
 ├── admin.html        管理页（上传/编辑/删除/设置）
-├── photos.json       照片元数据（地点、日期、介绍、分类、可见性）
-├── plans.json        周计划数据
-├── comments.json     照片评论数据
-├── messages.json     留言板数据
+├── photos.json       照片元数据（本地为空模板；真实数据在线上）
+├── plans.json        周计划数据（本地没有，只在线上）
+├── comments.json     照片评论数据（本地没有，只在线上）
+├── messages.json     留言板数据（本地为空模板；真实数据在线上）
 ├── photos/           照片文件（上传后自动写入）
 ├── assets/
 │   ├── css/          样式（base / gallery / login / admin）
 │   ├── js/           逻辑（common / store / gallery / login / admin）
 │   └── img/          favicon 与四个伙伴占位形象
-└── scripts/deploy.sh GitHub Pages 一键部署
+└── scripts/
+    ├── deploy.sh     GitHub Pages 一键部署
+    └── guestbook-worker.js  留言 / 照片评论的 Cloudflare Worker
 ```
 
 ## 伙伴形象素材

@@ -12,6 +12,7 @@
     whoami: document.getElementById('whoami'),
     modeTag: document.getElementById('modeTag'),
     modeText: document.getElementById('modeText'),
+    modeFix: document.getElementById('modeFix'),
     dropzone: document.getElementById('dropzone'),
     fileInput: document.getElementById('fileInput'),
     uploadList: document.getElementById('uploadList'),
@@ -86,23 +87,21 @@
     const wantGithub = lsGet(MODE_KEY) === 'github';
     const hasToken = !!lsGet('om_token');
 
-    if (!hasToken && wantGithub) {
-      els.modeTag.textContent = 'GitHub 未连接';
-      els.modeTag.className = 'tag pending';
-      els.modeText.textContent = '⚠️ 未检测到 Token（清缓存会清除它）。当前上传/删除只影响本机，不会同步到线上。请在下方粘贴 Token 并保存验证。';
-    } else if (wantGithub && hasToken) {
+    if (wantGithub && hasToken) {
       els.modeTag.textContent = 'GitHub 实时';
       els.modeTag.className = 'tag github';
       els.modeText.textContent = '照片会写入 GitHub 仓库，任何设备打开展览页都能看到最新内容。';
-    } else if (wantGithub && !hasToken) {
-      els.modeTag.textContent = 'GitHub 待配置';
+    } else if (wantGithub) {
+      els.modeTag.textContent = 'GitHub 未连接';
       els.modeTag.className = 'tag pending';
-      els.modeText.textContent = '已选择 GitHub 模式，请在下方向框粘贴 Token 并点「保存并验证」，生效后上传才会写入仓库。';
+      els.modeText.textContent = '⚠️ 这台浏览器里没有 Token（换电脑、清缓存或 Token 过期都会这样）。现在上传只存本机、展览页看不到，评论也发不出去。请粘贴 Token 并保存验证。';
     } else {
       els.modeTag.textContent = '本地演示';
       els.modeTag.className = 'tag local';
       els.modeText.textContent = '照片只存在这台电脑的浏览器里（仅本机可见），配置 GitHub Token 后即可正式上线。';
     }
+
+    if (els.modeFix) els.modeFix.style.display = hasToken ? 'none' : '';
 
     els.radioLocal.checked = !wantGithub;
     els.radioGithub.checked = wantGithub;
@@ -210,7 +209,9 @@
         item.status = 'ready';
       } catch (e) {
         item.status = 'error';
-        item.error = e.message;
+        item.error = /\.(hei[cf])$/i.test(item.file.name || '')
+          ? 'HEIC（iPhone 原图）浏览器解不了，请在「照片」里导出为 JPG 再上传'
+          : e.message;
       }
       renderUploadList();
       updateUploadBtnState();
@@ -299,6 +300,18 @@
       toast('照片尚未处理完成，请稍候再试', 'err');
       return;
     }
+
+    // 没有 Token 时上传写不到线上，本机存的照片展览页同样看不到，直接挡住并引导去配置
+    const hasToken = !!lsGet('om_token');
+    if (!hasToken) {
+      toast('还没配置 GitHub Token，上传写不进线上。先到「存储设置」粘贴 Token 并保存验证', 'err');
+      if (els.tokenInput) {
+        els.tokenInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        els.tokenInput.focus();
+      }
+      return;
+    }
+
     els.uploadBtn.disabled = true;
     els.uploadBtn.textContent = '正在准备…';
     try {
@@ -761,6 +774,14 @@
   /* ---------- 设置 ---------- */
 
   function setupSettings() {
+    if (els.modeFix) {
+      els.modeFix.addEventListener('click', function () {
+        if (!els.tokenInput) return;
+        els.tokenInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        els.tokenInput.focus();
+      });
+    }
+
     els.radioLocal.addEventListener('change', function () {
       if (!els.radioLocal.checked) return;
       if (lsGet('om_token')) {
@@ -844,6 +865,29 @@
     });
   }
 
+  /* 打开管理页时顺手查一次已保存的 Token 是否还有效（过期/撤销会返回 401） */
+  async function checkTokenHealth() {
+    const t = lsGet(TOKEN_KEY);
+    if (!t) return;
+    try {
+      const res = await fetch('https://api.github.com/user', {
+        headers: { Authorization: 'Bearer ' + t }
+      });
+      if (res.status === 401) {
+        els.modeTag.textContent = 'Token 已失效';
+        els.modeTag.className = 'tag pending';
+        els.modeText.textContent = '⚠️ 已保存的 Token 被 GitHub 拒绝（401），多半已过期或被撤销。现在上传和评论都会失败，请重新生成 Token 后粘贴。';
+        if (els.modeFix) {
+          els.modeFix.textContent = '重新粘贴 Token';
+          els.modeFix.style.display = '';
+        }
+        toast('已保存的 Token 失效了（401），请重新生成', 'err');
+      }
+    } catch (e) {
+      /* 网络异常不打扰，真实操作时还会再报一次 */
+    }
+  }
+
   /* ---------- 工具 ---------- */
 
   function esc(s) {
@@ -864,6 +908,7 @@
     refreshMsgList();
     refreshPlanPanel();
     refreshCmtList();
+    checkTokenHealth();
   }
 
   /* 关键按钮用事件委托，即使初始化某步出错也能响应 */
