@@ -199,79 +199,19 @@
     }).catch(function () {
       list.innerHTML = '<p class="cmt-empty">评论加载失败，请刷新重试</p>';
     });
-    const can = canWriteComments();
-    form.style.display = can ? '' : 'none';
+    form.style.display = lsGet(TOKEN_KEY) ? '' : 'none';
 
-    // 登录过的设备若还没有评论权限，给出「输入评论口令」的入口，而不是把输入框藏得无声无息
+    // 登录过的设备没有 Token 时，说清楚为什么看不到评论框
     const tip = document.getElementById('cmtTip');
     if (tip) {
-      if (can) {
-        hideCommentTip(tip);
+      if (!lsGet(TOKEN_KEY) && lsGet('om_user')) {
+        tip.hidden = false;
+        tip.innerHTML = '这台设备还不能评论：到 <a href="admin.html">管理页</a> →「存储设置」粘贴 GitHub Token 并保存验证，之后评论框就会出现。';
       } else {
-        renderCommentGate(tip);
+        tip.hidden = true;
+        tip.innerHTML = '';
       }
     }
-  }
-
-  function hideCommentTip(tip) {
-    tip.hidden = true;
-    tip.innerHTML = '';
-    delete tip.dataset.mode;
-  }
-
-  function renderCommentGate(tip) {
-    tip.hidden = false;
-    if (tip.dataset.mode === 'gate') return;
-    tip.dataset.mode = 'gate';
-    tip.innerHTML =
-      '<span>评论需要口令：在这台设备上输入一次就能用了（口令问对方要；站主也可以在管理页粘贴 GitHub Token）。</span>' +
-      '<span class="cmt-key">' +
-        '<input class="input" id="cmtKeyInput" type="password" placeholder="评论口令" autocomplete="off">' +
-        '<button class="btn btn-primary btn-sm" id="cmtKeySave" type="button">保存</button>' +
-      '</span>';
-    const input = tip.querySelector('#cmtKeyInput');
-    const btn = tip.querySelector('#cmtKeySave');
-    btn.addEventListener('click', async function () {
-      const v = input.value.trim();
-      if (!v) return;
-      btn.disabled = true;
-      btn.textContent = '验证中…';
-      const ok = await verifyCommentKey(v);
-      btn.disabled = false;
-      btn.textContent = '保存';
-      if (ok) {
-        setCommentKey(v);
-        const p = currentList[currentIndex];
-        renderComments(p ? p.id : null);
-      } else {
-        input.value = '';
-        input.placeholder = '口令不对，再试一次';
-      }
-    });
-  }
-
-  /* 用「删除一个不存在的评论」验证口令：401 = 口令错，404 找不到该评论 = 口令对 */
-  async function verifyCommentKey(key) {
-    let res;
-    try {
-      res = await fetch(GUESTBOOK_API + '/comments/delete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Comment-Key': key },
-        body: JSON.stringify({ id: '__verify__' })
-      });
-    } catch (e) {
-      alert('连不上评论服务，请检查网络或代理设置');
-      return false;
-    }
-    const data = await res.json().catch(function () { return null; });
-    if (data && /找不到这条评论/.test(data.error || '')) return true;
-    if (res.status === 401) return false;
-    if (res.status === 503) {
-      alert('评论服务还没启用：Worker 还没更新，或没设置 COMMENT_KEY');
-      return false;
-    }
-    alert('评论服务未就绪：' + ((data && data.error) || ('HTTP ' + res.status)));
-    return false;
   }
 
   /* ---------- 工具 ---------- */

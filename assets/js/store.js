@@ -656,16 +656,6 @@ async function deletePlan(id) {
 /* ============ 照片评论 ============ */
 
 const LOCAL_CMT_KEY = 'om_comments_local';
-const COMMENT_KEY_STORAGE = 'om_comment_key';
-
-/* 评论权限：有 GitHub Token（站主）或有评论口令（两人各自的设备） */
-function getCommentKey() { return lsGet(COMMENT_KEY_STORAGE) || ''; }
-function setCommentKey(k) {
-  const v = String(k || '').trim();
-  if (v) lsSet(COMMENT_KEY_STORAGE, v);
-  else lsDel(COMMENT_KEY_STORAGE);
-}
-function canWriteComments() { return !!lsGet(TOKEN_KEY) || !!getCommentKey(); }
 
 function localComments() {
   try { return JSON.parse(lsGet(LOCAL_CMT_KEY) || '[]'); } catch (e) { return []; }
@@ -693,7 +683,7 @@ async function loadComments(photoId) {
   return all.filter(function (c) { return c.photoId === photoId; });
 }
 
-/* 新增评论：有 Token 直接写 GitHub；没有 Token 但有评论口令，走 Worker 中转 */
+/* 新增评论：仅浏览器里有 GitHub Token 时可写（两人各自在自己的设备上粘贴一次） */
 async function addComment(photoId, content, author) {
   const c = {
     id: genId() + '-c',
@@ -702,45 +692,20 @@ async function addComment(photoId, content, author) {
     author: author || 'owner',
     time: new Date().toISOString()
   };
-  if (lsGet(TOKEN_KEY)) {
-    let existing = [];
-    try {
-      const f = await ghGetFile('comments.json', true);
-      if (f) existing = JSON.parse(f.content).comments || [];
-    } catch (e) {}
-    const updated = { version: 1, comments: [c].concat(existing) };
-    await ghPutFile('comments.json', JSON.stringify(updated, null, 2), '照片评论 ' + c.id);
-    return { comment: c, synced: true };
+  if (!lsGet(TOKEN_KEY)) {
+    throw new Error('这台设备还没有评论权限：到管理页 →「存储设置」粘贴 GitHub Token 并保存验证');
   }
-
-  const key = getCommentKey();
-  if (key) {
-    const ctrl = new AbortController();
-    const timer = setTimeout(function () { ctrl.abort(); }, 20000);
-    let res;
-    try {
-      res = await fetch(GUESTBOOK_API + '/comments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Comment-Key': key },
-        body: JSON.stringify({ photoId: photoId, content: content, author: c.author }),
-        signal: ctrl.signal
-      });
-    } catch (e) {
-      clearTimeout(timer);
-      throw new Error(e.name === 'AbortError' ? '评论服务连接超时，请重试' : '连不上评论服务，请检查网络或代理');
-    }
-    clearTimeout(timer);
-    const data = await res.json().catch(function () { return null; });
-    if (res.status === 401) throw new Error('评论口令不对，请在评论框上方重新输入');
-    if (!res.ok) throw new Error((data && data.error) || ('评论服务返回 ' + res.status));
-    return { comment: (data && data.comment) || c, synced: true };
-  }
-
-  // 无 Token 也无口令：不落本地，避免清缓存后「消失」
-  throw new Error('这台设备还没有评论权限（需要评论口令或 Token）');
+  let existing = [];
+  try {
+    const f = await ghGetFile('comments.json', true);
+    if (f) existing = JSON.parse(f.content).comments || [];
+  } catch (e) {}
+  const updated = { version: 1, comments: [c].concat(existing) };
+  await ghPutFile('comments.json', JSON.stringify(updated, null, 2), '照片评论 ' + c.id);
+  return { comment: c, synced: true };
 }
 
-/* 删除评论：有 Token 写 GitHub；有口令走 Worker；都没有只删本机副本 */
+/* 删除评论：有 Token 删 GitHub，没有只删本机副本 */
 async function deleteComment(id) {
   if (lsGet(TOKEN_KEY)) {
     let existing = [];
@@ -750,21 +715,8 @@ async function deleteComment(id) {
     } catch (e) { return false; }
     const rest = existing.filter(function (c) { return c.id !== id; });
     await ghPutFile('comments.json', JSON.stringify({ version: 1, comments: rest }, null, 2), '删除照片评论 ' + id);
-    return true;
+  } else {
+    lsSet(LOCAL_CMT_KEY, JSON.stringify(localComments().filter(function (c) { return c.id !== id; })));
   }
-
-  const key = getCommentKey();
-  if (key) {
-    const res = await fetch(GUESTBOOK_API + '/comments/delete', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Comment-Key': key },
-      body: JSON.stringify({ id: id })
-    });
-    const data = await res.json().catch(function () { return null; });
-    if (!res.ok) throw new Error((data && data.error) || ('删除失败 ' + res.status));
-    return true;
-  }
-
-  lsSet(LOCAL_CMT_KEY, JSON.stringify(localComments().filter(function (c) { return c.id !== id; })));
   return true;
 }

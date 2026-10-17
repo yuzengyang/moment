@@ -228,9 +228,6 @@
   background: #FFF3D6; border: 1px solid #F3DFAE;
 }
 .cmt-tip a { color: var(--peach); text-decoration: underline; }
-.cmt-tip .cmt-key { display: flex; gap: 8px; margin-top: 8px; }
-.cmt-tip .cmt-key .input { flex: 1; padding: 6px 10px; font-size: 0.8rem; }
-.cmt-tip .cmt-key .btn { flex: none; }
 
 .modal-info .m-count { font-size: 0.78rem; color: var(--ink-soft); opacity: 0.8; margin-bottom: 10px; letter-spacing: 0.05em; }
 .modal-info .m-meta { margin-top: auto; padding-top: 16px; border-top: 1px dashed var(--line); display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; color: var(--ink-soft); }
