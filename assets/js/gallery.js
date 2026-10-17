@@ -207,10 +207,8 @@
     if (tip) {
       if (can) {
         hideCommentTip(tip);
-      } else if (lsGet('om_user')) {
-        renderCommentGate(tip);
       } else {
-        hideCommentTip(tip);
+        renderCommentGate(tip);
       }
     }
   }
@@ -226,7 +224,7 @@
     if (tip.dataset.mode === 'gate') return;
     tip.dataset.mode = 'gate';
     tip.innerHTML =
-      '<span>这台设备还没有评论权限：输入一次「评论口令」就能评论（口令找对方要；站主也可以在管理页粘贴 GitHub Token）。</span>' +
+      '<span>评论需要口令：在这台设备上输入一次就能用了（口令问对方要；站主也可以在管理页粘贴 GitHub Token）。</span>' +
       '<span class="cmt-key">' +
         '<input class="input" id="cmtKeyInput" type="password" placeholder="评论口令" autocomplete="off">' +
         '<button class="btn btn-primary btn-sm" id="cmtKeySave" type="button">保存</button>' +
